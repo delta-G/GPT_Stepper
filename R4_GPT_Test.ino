@@ -1,3 +1,5 @@
+#include "GPT_Stepper.h"
+
 #define PRINT_REG(BUCKET, REGISTER) \
   do { \
     uint32_t t = BUCKET->REGISTER; \
@@ -70,7 +72,7 @@ void setupGPT3(){
   R_GPT3->GTIOR |= 0x100;
 
   //Set buffer ops GTBER
-  R_GPT3->GTBER = 0x010001;
+  R_GPT3->GTBER = 0x100001;
 
   //Set compare match GTCCRA / GTCCRB
   R_GPT3->GTCCR[0] = 5;
