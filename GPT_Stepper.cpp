@@ -103,21 +103,6 @@ void setPeriod(uint32_t us) {
 			}
 		}
 		R_GPT3->GTCNT = newCount;
-		
-		Serial.print("Current Div :");
-		Serial.print(currentDiv);
-		Serial.print("  div : ");
-		Serial.println(div);
-		Serial.print("period : ");
-		Serial.print(us);
-		Serial.print("  ticks  : ");
-		Serial.println(resetCount);
-		Serial.print("hiTicks : ");
-		Serial.println(hiTicks);
-		Serial.print("  current : ");
-		Serial.print(currentCount);
-		Serial.print("  newCount : ");
-		Serial.println(newCount);
 
 //     // restart the timer
 		R_GPT3->GTCR |= 1;

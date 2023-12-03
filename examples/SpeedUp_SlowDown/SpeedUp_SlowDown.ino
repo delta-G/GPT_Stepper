@@ -25,16 +25,15 @@ void loop() {
 
   static uint32_t pm = millis();
   uint32_t cm = millis();
-  if(cm - pm >= interval){
+  if (cm - pm >= interval) {
     pm = cm;
-    speed = speed + inc;
-    if((speed >= maxSpeed)||(speed <= minSpeed)){
-      inc = -inc;
-      speed += inc;
+    if (digitalRead(buttonPin) == LOW) {
+      speed = speed + inc;
+      if ((speed >= maxSpeed) || (speed <= minSpeed)) {
+        inc = -inc;
+        speed += inc;
+      }
+      setSpeed(speed);
     }
-    setSpeed(speed);
   }
-
-
 }
-
