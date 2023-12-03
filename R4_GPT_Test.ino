@@ -12,7 +12,8 @@ void setup() {
 
   pinMode(7, INPUT_PULLUP);
   Serial.begin(115200);
-  while(!Serial);
+  while (!Serial)
+    ;
   Serial.println("\n\nStarting R4_GPT_Test.ino\n\n");
   printRegisters();
 
@@ -20,29 +21,34 @@ void setup() {
   printRegisters();
   delay(250);
   printRegisters();
-
+  setSpeed(350);
+  printRegisters();
 }
 
 void loop() {
   static uint8_t oldState = HIGH;
   uint8_t state = digitalRead(7);
-  if(state == LOW && oldState == HIGH){
+  if (state == LOW && oldState == HIGH) {
     delay(50);
     printRegisters();
   }
   oldState = state;
 
+  static int oldVal = 0;
   int val = analogRead(0);
-  // val = map(val, 0, 1023, 0x0f, 0xffff);
-  R_GPT3->GTPBR = val;
-
+  int dif = val - oldVal;
+  if (abs(dif) >= 50) {
+    val = map(val, 0, 1023, 1, 1000);
+    setSpeed(val);
+    oldVal = val;
+  }
 }
 
-void setupPin(){
+void setupPin() {
   R_PFS->PORT[1].PIN[11].PmnPFS = (1 << R_PFS_PORT_PIN_PmnPFS_PDR_Pos) | (1 << R_PFS_PORT_PIN_PmnPFS_PMR_Pos) | (3 << R_PFS_PORT_PIN_PmnPFS_PSEL_Pos);
 }
 
-void setupGPT3(){
+void setupGPT3() {
 
   // enable in Master stop register
   R_MSTP->MSTPCRD &= ~(1 << R_MSTP_MSTPCRD_MSTPD6_Pos);
@@ -82,10 +88,9 @@ void setupGPT3(){
 
   //Start count operation GTCR.CST = 1
   R_GPT3->GTCR |= 1;
-
 }
 
-void printRegisters(){
+void printRegisters() {
   Serial.println("\n***Registers***\n");
   PRINT_REG(R_GPT3, GTWP);
   PRINT_REG(R_GPT3, GTPR);

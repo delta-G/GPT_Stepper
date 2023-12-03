@@ -24,5 +24,6 @@ GPT_Stepper.h  --  Control stepper motor pulses using a GPT timer
 #include "Arduino.h"
 
 void setPeriod(uint32_t us);
+void setSpeed(int stepsPerSecond);
 
 #endif /* GPT3_STEPPER_H */
