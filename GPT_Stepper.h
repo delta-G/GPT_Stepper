@@ -25,5 +25,8 @@ GPT_Stepper.h  --  Control stepper motor pulses using a GPT timer
 
 void setPeriod(uint32_t us);
 void setSpeed(int stepsPerSecond);
+uint16_t getDivider();
+uint32_t getTimerResolution();
+uint16_t getMinSpeed();
 
 #endif /* GPT3_STEPPER_H */
