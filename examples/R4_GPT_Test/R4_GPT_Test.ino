@@ -37,7 +37,7 @@ void loop() {
   static int oldVal = 0;
   int val = analogRead(0);
   int dif = val - oldVal;
-  if (abs(dif) >= 20) {
+  if (abs(dif) >= 3) {
     Serial.println(val);
     oldVal = val;
     val = map(val, 0, 1023, 1, 1000);

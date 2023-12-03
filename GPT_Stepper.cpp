@@ -33,8 +33,6 @@ uint16_t getMinSpeed() {
 	return (F_CPU) / (getTimerResolution() * getDivider());
 }
 
-
-
 uint16_t getDivider() {
 	return ((R_GPT3->GTCR >> (R_GPT0_GTCR_TPCS_Pos + 1)) & 0x07) * 4;
 }
@@ -59,14 +57,14 @@ void setPeriod(uint32_t us) {
 		ticks /= 4;
 	}
 	uint8_t currentDiv = ((R_GPT3->GTCR >> (R_GPT0_GTCR_TPCS_Pos + 1)) & 0x07);
-	Serial.print("Current Div :");
-	Serial.print(currentDiv);
-	Serial.print("  div : ");
-	Serial.println(div);
 	if (currentDiv == div) {
 		// if the prescaler still works then we can just set the reset value
 		R_GPT3->GTPBR = resetCount;
 	} else {
+		Serial.print("Current Div :");
+		Serial.print(currentDiv);
+		Serial.print("  div : ");
+		Serial.println(div);
 //     // stops counter and sets prescaler
 		R_GPT3->GTSTP = (1 << 3);
 		R_GPT3->GTCR = (div << (R_GPT0_GTCR_TPCS_Pos + 1)); // R_GPT0_GTCR_TPCS_Pos is wrong.
@@ -80,8 +78,23 @@ void setPeriod(uint32_t us) {
 			hiTicks = 2;   // minimum pulse
 		R_GPT3->GTCCR[0] = hiTicks;
 
-//     // reset counter
-		R_GPT3->GTCLR = (1 << 3);
+		// figure out our current place in the count with the new divider
+		uint32_t currentCount = R_GPT3->GTCNT;
+		if (div > currentDiv) {
+			// If the new divider is larger then the top value will lekely be smaller
+			// So we need to check the count is not already past 
+			uint32_t newCount = (currentCount * currentDiv) / div;
+			if (newCount >= resetCount) {
+				newCount = resetCount;
+			}
+			R_GPT3->GTCNT = newCount;
+		} else {
+			// since the new divider is smaller, the top value will 
+			// likely be larger so let's just check that it's in range.
+			if (currentCount >= resetCount) {
+				R_GPT3->GTCNT = resetCount;
+			}
+		}
 
 //     // restart the timer
 		R_GPT3->GTCR |= 1;
