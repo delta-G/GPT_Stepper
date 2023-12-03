@@ -34,7 +34,7 @@ uint16_t getMinSpeed() {
 }
 
 uint16_t getDivider() {
-	return ((R_GPT3->GTCR >> (R_GPT0_GTCR_TPCS_Pos + 1)) & 0x07) * 4;
+	return 1 << (((R_GPT3->GTCR >> (R_GPT0_GTCR_TPCS_Pos + 1)) & 0x07) * 2);
 }
 
 uint32_t getTimerResolution() {
@@ -42,7 +42,6 @@ uint32_t getTimerResolution() {
 }
 
 void setPeriod(uint32_t us) {
-	uint8_t divbits = 0;
 	// PCLKD is running at full system speed, 48MHz.  That's 48 ticks per microsecond.
 	uint32_t ticks = (clock_uHz * us);
 	uint32_t timerResolution = getTimerResolution(); // We'll need this when we support 32 bit timers
@@ -50,7 +49,7 @@ void setPeriod(uint32_t us) {
 	// Find smallest divider that works.  1, 4, 16, 64, 256, 1024
 	uint8_t div = 0;
 	for (div = 0; div < 5; div++) {
-		if (ticks < timerResolution) {
+		if (ticks < (timerResolution - 2000)) {
 			resetCount = ticks;
 			break;
 		}
@@ -61,42 +60,114 @@ void setPeriod(uint32_t us) {
 		// if the prescaler still works then we can just set the reset value
 		R_GPT3->GTPBR = resetCount;
 	} else {
-		Serial.print("Current Div :");
-		Serial.print(currentDiv);
-		Serial.print("  div : ");
-		Serial.println(div);
+
 //     // stops counter and sets prescaler
-		R_GPT3->GTSTP = (1 << 3);
+//		R_GPT3->GTSTP = (1 << 3);
+		R_GPT3->GTCR = 0;
 		R_GPT3->GTCR = (div << (R_GPT0_GTCR_TPCS_Pos + 1)); // R_GPT0_GTCR_TPCS_Pos is wrong.
 		R_GPT3->GTPR = resetCount;
-
+		R_GPT3->GTPBR = resetCount;
 		// reset the compare match for the new prescaler
 		uint32_t hiTicks = 48ul * 3;    // 3 microsecond pulse
-		if (div)
-			hiTicks /= (4 * div);  // Scale to the prescaler.
-		if (hiTicks < 2)
+		if (div) {
+			hiTicks /= (1 << (div * 2));  // Scale to the prescaler.
+		}
+		if (hiTicks < 2) {
 			hiTicks = 2;   // minimum pulse
+		}
 		R_GPT3->GTCCR[0] = hiTicks;
 
 		// figure out our current place in the count with the new divider
 		uint32_t currentCount = R_GPT3->GTCNT;
+		uint32_t newCount = 0;
 		if (div > currentDiv) {
 			// If the new divider is larger then the top value will lekely be smaller
 			// So we need to check the count is not already past 
-			uint32_t newCount = (currentCount * currentDiv) / div;
+			newCount = (currentCount * (1 << (currentDiv * 2)))
+					/ (1 << (div * 2));
 			if (newCount >= resetCount) {
-				newCount = resetCount;
+				newCount = resetCount - 1;
+			} else if (newCount < hiTicks) {
+				newCount = hiTicks + 1;
 			}
-			R_GPT3->GTCNT = newCount;
 		} else {
 			// since the new divider is smaller, the top value will 
 			// likely be larger so let's just check that it's in range.
+
 			if (currentCount >= resetCount) {
-				R_GPT3->GTCNT = resetCount;
+				newCount = resetCount - 1;
+			} else if (currentCount < hiTicks) {
+				newCount = hiTicks + 1;
+			} else {
+				newCount = currentCount;
 			}
 		}
+		R_GPT3->GTCNT = newCount;
+		
+		Serial.print("Current Div :");
+		Serial.print(currentDiv);
+		Serial.print("  div : ");
+		Serial.println(div);
+		Serial.print("period : ");
+		Serial.print(us);
+		Serial.print("  ticks  : ");
+		Serial.println(resetCount);
+		Serial.print("hiTicks : ");
+		Serial.println(hiTicks);
+		Serial.print("  current : ");
+		Serial.print(currentCount);
+		Serial.print("  newCount : ");
+		Serial.println(newCount);
 
 //     // restart the timer
 		R_GPT3->GTCR |= 1;
 	}
+}
+
+void setupPin() {
+	R_PFS->PORT[1].PIN[11].PmnPFS = (1 << R_PFS_PORT_PIN_PmnPFS_PDR_Pos)
+			| (1 << R_PFS_PORT_PIN_PmnPFS_PMR_Pos)
+			| (3 << R_PFS_PORT_PIN_PmnPFS_PSEL_Pos);
+}
+
+void setupGPT3() {
+
+	// enable in Master stop register
+	R_MSTP->MSTPCRD &= ~(1 << R_MSTP_MSTPCRD_MSTPD6_Pos);
+
+	// enable Write GTWP
+	R_GPT3->GTWP = 0xA500;
+
+	// set count direction GTUDDTYC
+	R_GPT3->GTUDDTYC = 0x00000001;
+
+	//Select count clock GTCR  1/64 prescaler
+	R_GPT3->GTCR = 0x03000000;
+
+	//Set Cycle GTPR
+	R_GPT3->GTPR = 0xFFFF;
+	R_GPT3->GTPBR = 0x3FFF;
+
+	//Set initial value GTCNT
+	R_GPT3->GTCNT = 0;
+
+	setupPin();
+
+	//set GTIOC pin function GTIOR
+	R_GPT3->GTIOR = 0x00000009;
+
+	//Enable GTIOC pin GTIOR
+	R_GPT3->GTIOR |= 0x100;
+
+	//Set buffer ops GTBER
+	R_GPT3->GTBER = 0x100001;
+
+	//Set compare match GTCCRA / GTCCRB
+	R_GPT3->GTCCR[0] = 5;
+
+	//Set Buffer Values GTCCRC / GTCCRE and GTCCRD / GTCCRF
+	// Not applicable to our situation
+
+	//Start count operation GTCR.CST = 1
+	R_GPT3->GTCR |= 1;
 }

@@ -28,5 +28,7 @@ void setSpeed(int stepsPerSecond);
 uint16_t getDivider();
 uint32_t getTimerResolution();
 uint16_t getMinSpeed();
+void setupPin();
+void setupGPT3();
 
 #endif /* GPT3_STEPPER_H */
