@@ -23,12 +23,31 @@ GPT_Stepper.h  --  Control stepper motor pulses using a GPT timer
 
 #include "Arduino.h"
 
-void setPeriod(uint32_t us);
-void setSpeed(int stepsPerSecond);
-uint16_t getDivider();
-uint32_t getTimerResolution();
-uint16_t getMinSpeed();
-void setupPin();
-void setupGPT3();
+typedef enum {
+	CHANNEL_A,
+	CHANNEL_B
+} gpt_channel_t;
+
+class GPT_Stepper {
+	
+	R_GPT0_Type* timer;
+	gpt_channel_t channel;
+	uint8_t divBits;
+	uint8_t directionPin;
+	uint8_t stepPin;
+	void setupStepPin();
+	
+public:
+	GPT_Stepper(uint8_t spin, uint8_t dpin) : directionPin(dpin), stepPin(spin) {}
+	bool init();
+	void setupTimer();
+	void setPeriod(uint32_t us);
+	void setSpeed(int stepsPerSecond);
+	uint16_t getDivider();
+	uint32_t getTimerResolution();
+	uint16_t getMinSpeed();
+	
+};
+
 
 #endif /* GPT3_STEPPER_H */

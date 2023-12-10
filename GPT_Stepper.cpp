@@ -23,25 +23,128 @@
 
 const uint32_t clock_uHz = (F_CPU / 1000000);
 
-void setSpeed(int stepsPerSecond) {
+void setupPin(uint8_t port, uint8_t pin) {
+	R_PFS->PORT[port].PIN[pin].PmnPFS = (1 << R_PFS_PORT_PIN_PmnPFS_PDR_Pos)
+			| (1 << R_PFS_PORT_PIN_PmnPFS_PMR_Pos)
+			| (3 << R_PFS_PORT_PIN_PmnPFS_PSEL_Pos);
+}
+
+void GPT_Stepper::setupStepPin() {
+	switch (stepPin) {
+	case 0:
+		timer = R_GPT4;
+		channel = CHANNEL_B;
+		setupPin(3, 1);
+		break;
+	case 1:
+		timer = R_GPT4;
+		channel = CHANNEL_A;
+		setupPin(3, 2);
+		break;
+	case 2:
+		timer = R_GPT1;
+		channel = CHANNEL_B;
+		setupPin(1, 4);
+		break;
+	case 3:
+		timer = R_GPT1;
+		channel = CHANNEL_A;
+		setupPin(1, 5);
+		break;
+	case 4:
+		timer = R_GPT0;
+		channel = CHANNEL_B;
+		setupPin(1, 6);
+		break;
+	case 5:
+		timer = R_GPT0;
+		channel = CHANNEL_A;
+		setupPin(1, 7);
+		break;
+	case 6:
+		timer = R_GPT3;
+		channel = CHANNEL_A;
+		setupPin(1, 11);
+		break;
+	case 7:
+		timer = R_GPT3;
+		channel = CHANNEL_B;
+		setupPin(1, 12);
+		break;
+	case 8:
+		timer = R_GPT7;
+		channel = CHANNEL_A;
+		setupPin(3, 4);
+		break;
+	case 9:
+		timer = R_GPT7;
+		channel = CHANNEL_B;
+		setupPin(3, 3);
+		break;
+	case 10:
+		timer = R_GPT2;
+		channel = CHANNEL_A;
+		setupPin(1, 3);
+		break;
+	case 11:
+		timer = R_GPT6;
+		channel = CHANNEL_A;
+		setupPin(4, 11);
+		break;
+	case 12:
+		timer = R_GPT6;
+		channel = CHANNEL_B;
+		setupPin(4, 10);
+		break;
+	case 13:
+		timer = R_GPT2;
+		channel = CHANNEL_B;
+		setupPin(1, 2);
+		break;
+	case A4:
+		timer = R_GPT5;
+		channel = CHANNEL_A;
+		setupPin(1, 1);
+		break;
+	case A5:
+		timer = R_GPT5;
+		channel = CHANNEL_B;
+		setupPin(1, 0);
+		break;
+	}
+}
+
+bool GPT_Stepper::init() {
+	setupStepPin();
+	if (timer) {
+		setupTimer();
+	} else {
+		return false;
+	}
+	pinMode(directionPin, OUTPUT);
+	digitalWrite(directionPin, LOW);
+	return true;
+}
+
+void GPT_Stepper::setSpeed(int stepsPerSecond) {
 	uint32_t us = 1000000UL / stepsPerSecond;
 	setPeriod(us);
 }
 
-uint16_t getMinSpeed() {
+uint16_t GPT_Stepper::getMinSpeed() {
 	// get the minimum speed without changing divider
 	return (F_CPU) / (getTimerResolution() * getDivider());
 }
 
-uint16_t getDivider() {
-	return 1 << (((R_GPT3->GTCR >> (R_GPT0_GTCR_TPCS_Pos + 1)) & 0x07) * 2);
+uint16_t GPT_Stepper::getDivider() {
+	return 1 << (((timer->GTCR >> (R_GPT0_GTCR_TPCS_Pos + 1)) & 0x07) * 2);
 }
 
-uint32_t getTimerResolution() {
+uint32_t GPT_Stepper::getTimerResolution() {
 	return 0xFFFF;  // Not supporting 32 bit yet
 }
 
-void setPeriod(uint32_t us) {
+void GPT_Stepper::setPeriod(uint32_t us) {
 	// PCLKD is running at full system speed, 48MHz.  That's 48 ticks per microsecond.
 	uint32_t ticks = (clock_uHz * us);
 	uint32_t timerResolution = getTimerResolution(); // We'll need this when we support 32 bit timers
@@ -55,18 +158,17 @@ void setPeriod(uint32_t us) {
 		}
 		ticks /= 4;
 	}
-	uint8_t currentDiv = ((R_GPT3->GTCR >> (R_GPT0_GTCR_TPCS_Pos + 1)) & 0x07);
+	uint8_t currentDiv = ((timer->GTCR >> (R_GPT0_GTCR_TPCS_Pos + 1)) & 0x07);
 	if (currentDiv == div) {
 		// if the prescaler still works then we can just set the reset value
-		R_GPT3->GTPBR = resetCount;
+		timer->GTPBR = resetCount;
 	} else {
 
 //     // stops counter and sets prescaler
-//		R_GPT3->GTSTP = (1 << 3);
-		R_GPT3->GTCR = 0;
-		R_GPT3->GTCR = (div << (R_GPT0_GTCR_TPCS_Pos + 1)); // R_GPT0_GTCR_TPCS_Pos is wrong.
-		R_GPT3->GTPR = resetCount;
-		R_GPT3->GTPBR = resetCount;
+		timer->GTCR = 0;
+		timer->GTCR = (div << (R_GPT0_GTCR_TPCS_Pos + 1)); // R_GPT0_GTCR_TPCS_Pos is wrong.
+		timer->GTPR = resetCount;
+		timer->GTPBR = resetCount;
 		// reset the compare match for the new prescaler
 		uint32_t hiTicks = 48ul * 3;    // 3 microsecond pulse
 		if (div) {
@@ -75,10 +177,10 @@ void setPeriod(uint32_t us) {
 		if (hiTicks < 2) {
 			hiTicks = 2;   // minimum pulse
 		}
-		R_GPT3->GTCCR[0] = hiTicks;
+		timer->GTCCR[channel] = hiTicks;
 
 		// figure out our current place in the count with the new divider
-		uint32_t currentCount = R_GPT3->GTCNT;
+		uint32_t currentCount = timer->GTCNT;
 		uint32_t newCount = 0;
 		if (div > currentDiv) {
 			// If the new divider is larger then the top value will lekely be smaller
@@ -102,57 +204,54 @@ void setPeriod(uint32_t us) {
 				newCount = currentCount;
 			}
 		}
-		R_GPT3->GTCNT = newCount;
+		timer->GTCNT = newCount;
 
 //     // restart the timer
-		R_GPT3->GTCR |= 1;
+		timer->GTCR |= 1;
 	}
 }
 
-void setupPin() {
-	R_PFS->PORT[1].PIN[11].PmnPFS = (1 << R_PFS_PORT_PIN_PmnPFS_PDR_Pos)
-			| (1 << R_PFS_PORT_PIN_PmnPFS_PMR_Pos)
-			| (3 << R_PFS_PORT_PIN_PmnPFS_PSEL_Pos);
-}
+void GPT_Stepper::setupTimer() {
 
-void setupGPT3() {
-
-	// enable in Master stop register
-	R_MSTP->MSTPCRD &= ~(1 << R_MSTP_MSTPCRD_MSTPD6_Pos);
+	// enable in Master stop register in case they're not already
+	R_MSTP->MSTPCRD &= ~(1 << R_MSTP_MSTPCRD_MSTPD6_Pos);  // 16bit GPT
+	R_MSTP->MSTPCRD &= ~(1 << R_MSTP_MSTPCRD_MSTPD5_Pos);  // 32bit GPT
 
 	// enable Write GTWP
-	R_GPT3->GTWP = 0xA500;
+	timer->GTWP = 0xA500;
 
 	// set count direction GTUDDTYC
-	R_GPT3->GTUDDTYC = 0x00000001;
+	timer->GTUDDTYC = 0x00000001;
 
 	//Select count clock GTCR  1/64 prescaler
-	R_GPT3->GTCR = 0x03000000;
+	timer->GTCR = 0x03000000;
 
 	//Set Cycle GTPR
-	R_GPT3->GTPR = 0xFFFF;
-	R_GPT3->GTPBR = 0x3FFF;
+	timer->GTPR = 0xFFFF;
+	timer->GTPBR = 0x3FFF;
 
 	//Set initial value GTCNT
-	R_GPT3->GTCNT = 0;
-
-	setupPin();
+	timer->GTCNT = 0;
 
 	//set GTIOC pin function GTIOR
-	R_GPT3->GTIOR = 0x00000009;
-
-	//Enable GTIOC pin GTIOR
-	R_GPT3->GTIOR |= 0x100;
+	//0x09 is Initial state = LOW, HIGH at cycle end, LOW at compare match.
+	if (channel == CHANNEL_A) {
+		timer->GTIOR = 0x00000009UL;
+		timer->GTIOR |= 0x100;  // enable the pin
+	} else if (channel == CHANNEL_B) {
+		timer->GTIOR = 0x00090000UL;
+		timer->GTIOR |= 0x1000000;  // enable the pin
+	}
 
 	//Set buffer ops GTBER
-	R_GPT3->GTBER = 0x100001;
+	timer->GTBER = 0x100001;
 
 	//Set compare match GTCCRA / GTCCRB
-	R_GPT3->GTCCR[0] = 5;
+	timer->GTCCR[channel] = 5;
 
 	//Set Buffer Values GTCCRC / GTCCRE and GTCCRD / GTCCRF
 	// Not applicable to our situation
 
 	//Start count operation GTCR.CST = 1
-	R_GPT3->GTCR |= 1;
+	timer->GTCR |= 1;
 }
