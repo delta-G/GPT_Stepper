@@ -2,12 +2,12 @@
 
 const uint8_t buttonPin = 8;
 uint32_t interval = 250;
-int speed = 1;
-int inc = 5;
-int maxSpeed = 850;
-int minSpeed = 1;
+float speed = 1;
+int inc = 10;
+int maxSpeed = 500;
+int minSpeed = -500;
 
-GPT_Stepper stepper(2,7);
+GPT_Stepper stepper(6,7);
 
 void setup() {
   pinMode(buttonPin, INPUT_PULLUP);

@@ -126,9 +126,32 @@ bool GPT_Stepper::init() {
 	return true;
 }
 
-void GPT_Stepper::setSpeed(int stepsPerSecond) {
-	uint32_t us = 1000000UL / stepsPerSecond;
-	setPeriod(us);
+void GPT_Stepper::setSpeed(float stepsPerSecond) {
+	if (stepsPerSecond == 0) {
+		stop();
+	} else {
+		if (stepsPerSecond < 0) {
+			setDirection (D_CCW);
+		} else {
+			setDirection (D_CW);
+		}
+		uint32_t us = 1000000UL
+				/ (stepsPerSecond > 0 ? stepsPerSecond : -stepsPerSecond);
+		setPeriod(us);
+	}
+}
+
+void GPT_Stepper::setDirection(Direction_t direction) {
+	if (direction == D_CCW) {
+		digitalWrite(directionPin, LOW);
+	} else {
+		digitalWrite(directionPin, HIGH);
+	}
+}
+
+void GPT_Stepper::stop() {
+	// stop the timer:
+	timer->GTCR &= ~1;
 }
 
 uint16_t GPT_Stepper::getMinSpeed() {
@@ -159,13 +182,13 @@ void GPT_Stepper::setPeriod(uint32_t us) {
 		ticks /= 4;
 	}
 	uint8_t currentDiv = ((timer->GTCR >> (R_GPT0_GTCR_TPCS_Pos + 1)) & 0x07);
-	if (currentDiv == div) {
-		// if the prescaler still works then we can just set the reset value
+	if (currentDiv == div && timerRunning()) {
+		// if the prescaler still works and the timer is running 
+		// then we can just set the reset value for the next count
 		timer->GTPBR = resetCount;
 	} else {
-
 //     // stops counter and sets prescaler
-		timer->GTCR = 0;
+		stopTimer();
 		timer->GTCR = (div << (R_GPT0_GTCR_TPCS_Pos + 1)); // R_GPT0_GTCR_TPCS_Pos is wrong.
 		timer->GTPR = resetCount;
 		timer->GTPBR = resetCount;
@@ -205,9 +228,8 @@ void GPT_Stepper::setPeriod(uint32_t us) {
 			}
 		}
 		timer->GTCNT = newCount;
-
-//     // restart the timer
-		timer->GTCR |= 1;
+		// restart the timer 
+		startTimer();
 	}
 }
 
@@ -254,4 +276,16 @@ void GPT_Stepper::setupTimer() {
 
 	//Start count operation GTCR.CST = 1
 	timer->GTCR |= 1;
+}
+
+void GPT_Stepper::stopTimer() {
+	timer->GTCR &= ~1;
+}
+
+void GPT_Stepper::startTimer() {
+	timer->GTCR |= 1;
+}
+
+bool GPT_Stepper::timerRunning() {
+	return (timer->GTCR & 1);
 }
