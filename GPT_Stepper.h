@@ -38,27 +38,29 @@ private:
 
 	R_GPT0_Type *timer;
 	gpt_channel_t channel;
-	uint8_t divBits;
+
 	uint8_t directionPin;
 	uint8_t stepPin;
-	void setupStepPin();
+
+	void setupStepPin(uint8_t port, uint8_t pin);
+	void setupTimer();
 	void setDirection(Direction_t direction);
+
 	bool timerRunning();
 	void startTimer();
 	void stopTimer();
+
+	uint16_t getDivider();
+	uint32_t getTimerResolution();
 
 public:
 	GPT_Stepper(uint8_t spin, uint8_t dpin) :
 			directionPin(dpin), stepPin(spin) {
 	}
 	bool init();
-	void setupTimer();
-	void setPeriod(uint32_t us);
 	void setSpeed(float stepsPerSecond);
-	uint16_t getDivider();
-	uint32_t getTimerResolution();
-	uint16_t getMinSpeed();
 	void stop();
+	void setPeriod(uint32_t us);
 
 };
 

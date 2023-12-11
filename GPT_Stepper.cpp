@@ -23,99 +23,96 @@
 
 const uint32_t clock_uHz = (F_CPU / 1000000);
 
-void setupPin(uint8_t port, uint8_t pin) {
-	R_PFS->PORT[port].PIN[pin].PmnPFS = (1 << R_PFS_PORT_PIN_PmnPFS_PDR_Pos)
-			| (1 << R_PFS_PORT_PIN_PmnPFS_PMR_Pos)
-			| (3 << R_PFS_PORT_PIN_PmnPFS_PSEL_Pos);
-}
+/**********************************************************************
+ * 
+ *   Public Member Functions
+ * 
+ *********************************************************************/
 
-void GPT_Stepper::setupStepPin() {
+bool GPT_Stepper::init() {
+
 	switch (stepPin) {
 	case 0:
 		timer = R_GPT4;
 		channel = CHANNEL_B;
-		setupPin(3, 1);
+		setupStepPin(3, 1);
 		break;
 	case 1:
 		timer = R_GPT4;
 		channel = CHANNEL_A;
-		setupPin(3, 2);
+		setupStepPin(3, 2);
 		break;
 	case 2:
 		timer = R_GPT1;
 		channel = CHANNEL_B;
-		setupPin(1, 4);
+		setupStepPin(1, 4);
 		break;
 	case 3:
 		timer = R_GPT1;
 		channel = CHANNEL_A;
-		setupPin(1, 5);
+		setupStepPin(1, 5);
 		break;
 	case 4:
 		timer = R_GPT0;
 		channel = CHANNEL_B;
-		setupPin(1, 6);
+		setupStepPin(1, 6);
 		break;
 	case 5:
 		timer = R_GPT0;
 		channel = CHANNEL_A;
-		setupPin(1, 7);
+		setupStepPin(1, 7);
 		break;
 	case 6:
 		timer = R_GPT3;
 		channel = CHANNEL_A;
-		setupPin(1, 11);
+		setupStepPin(1, 11);
 		break;
 	case 7:
 		timer = R_GPT3;
 		channel = CHANNEL_B;
-		setupPin(1, 12);
+		setupStepPin(1, 12);
 		break;
 	case 8:
 		timer = R_GPT7;
 		channel = CHANNEL_A;
-		setupPin(3, 4);
+		setupStepPin(3, 4);
 		break;
 	case 9:
 		timer = R_GPT7;
 		channel = CHANNEL_B;
-		setupPin(3, 3);
+		setupStepPin(3, 3);
 		break;
 	case 10:
 		timer = R_GPT2;
 		channel = CHANNEL_A;
-		setupPin(1, 3);
+		setupStepPin(1, 3);
 		break;
 	case 11:
 		timer = R_GPT6;
 		channel = CHANNEL_A;
-		setupPin(4, 11);
+		setupStepPin(4, 11);
 		break;
 	case 12:
 		timer = R_GPT6;
 		channel = CHANNEL_B;
-		setupPin(4, 10);
+		setupStepPin(4, 10);
 		break;
 	case 13:
 		timer = R_GPT2;
 		channel = CHANNEL_B;
-		setupPin(1, 2);
+		setupStepPin(1, 2);
 		break;
 	case A4:
 		timer = R_GPT5;
 		channel = CHANNEL_A;
-		setupPin(1, 1);
+		setupStepPin(1, 1);
 		break;
 	case A5:
 		timer = R_GPT5;
 		channel = CHANNEL_B;
-		setupPin(1, 0);
+		setupStepPin(1, 0);
 		break;
 	}
-}
-
-bool GPT_Stepper::init() {
-	setupStepPin();
 	if (timer) {
 		setupTimer();
 	} else {
@@ -141,30 +138,9 @@ void GPT_Stepper::setSpeed(float stepsPerSecond) {
 	}
 }
 
-void GPT_Stepper::setDirection(Direction_t direction) {
-	if (direction == D_CCW) {
-		digitalWrite(directionPin, LOW);
-	} else {
-		digitalWrite(directionPin, HIGH);
-	}
-}
-
 void GPT_Stepper::stop() {
 	// stop the timer:
 	timer->GTCR &= ~1;
-}
-
-uint16_t GPT_Stepper::getMinSpeed() {
-	// get the minimum speed without changing divider
-	return (F_CPU) / (getTimerResolution() * getDivider());
-}
-
-uint16_t GPT_Stepper::getDivider() {
-	return 1 << (((timer->GTCR >> (R_GPT0_GTCR_TPCS_Pos + 1)) & 0x07) * 2);
-}
-
-uint32_t GPT_Stepper::getTimerResolution() {
-	return 0xFFFF;  // Not supporting 32 bit yet
 }
 
 void GPT_Stepper::setPeriod(uint32_t us) {
@@ -233,6 +209,18 @@ void GPT_Stepper::setPeriod(uint32_t us) {
 	}
 }
 
+/**********************************************************************
+ * 
+ *   Private Member Functions
+ * 
+ *********************************************************************/
+
+void GPT_Stepper::setupStepPin(uint8_t port, uint8_t pin) {
+	R_PFS->PORT[port].PIN[pin].PmnPFS = (1 << R_PFS_PORT_PIN_PmnPFS_PDR_Pos)
+			| (1 << R_PFS_PORT_PIN_PmnPFS_PMR_Pos)
+			| (3 << R_PFS_PORT_PIN_PmnPFS_PSEL_Pos);
+}
+
 void GPT_Stepper::setupTimer() {
 
 	// enable in Master stop register in case they're not already
@@ -278,6 +266,14 @@ void GPT_Stepper::setupTimer() {
 	timer->GTCR |= 1;
 }
 
+void GPT_Stepper::setDirection(Direction_t direction) {
+	if (direction == D_CCW) {
+		digitalWrite(directionPin, LOW);
+	} else {
+		digitalWrite(directionPin, HIGH);
+	}
+}
+
 void GPT_Stepper::stopTimer() {
 	timer->GTCR &= ~1;
 }
@@ -288,4 +284,12 @@ void GPT_Stepper::startTimer() {
 
 bool GPT_Stepper::timerRunning() {
 	return (timer->GTCR & 1);
+}
+
+uint16_t GPT_Stepper::getDivider() {
+	return 1 << (((timer->GTCR >> (R_GPT0_GTCR_TPCS_Pos + 1)) & 0x07) * 2);
+}
+
+uint32_t GPT_Stepper::getTimerResolution() {
+	return 0xFFFF;  // Not supporting 32 bit yet
 }
