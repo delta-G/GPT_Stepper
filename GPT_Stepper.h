@@ -21,6 +21,10 @@
 #ifndef GPT3_STEPPER_H
 #define GPT3_STEPPER_H
 
+#if !defined(ARDUINO_UNOR4_WIFI)
+#error This library is only supported on the UNO-R4-WiFi at this time.  It does not support older UNO boards.
+#endif
+
 #include "Arduino.h"
 
 typedef enum {
@@ -38,6 +42,7 @@ private:
 
 	R_GPT0_Type *timer;
 	gpt_channel_t channel;
+	static bool timerClaimed[8];
 
 	uint8_t directionPin;
 	uint8_t stepPin;
@@ -61,6 +66,10 @@ public:
 	void setSpeed(float stepsPerSecond);
 	void stop();
 	void setPeriod(uint32_t us);
+
+	GPT_Stepper() = delete;
+	GPT_Stepper(const GPT_Stepper&) = delete;
+	GPT_Stepper& operator =(const GPT_Stepper&) = delete;
 
 };
 

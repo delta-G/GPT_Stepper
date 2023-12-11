@@ -23,6 +23,8 @@
 
 const uint32_t clock_uHz = (F_CPU / 1000000);
 
+bool GPT_Stepper::timerClaimed[8];
+
 /**********************************************************************
  * 
  *   Public Member Functions
@@ -31,99 +33,153 @@ const uint32_t clock_uHz = (F_CPU / 1000000);
 
 bool GPT_Stepper::init() {
 
+	bool rv = false;
+
 	switch (stepPin) {
 	case 0:
-		timer = R_GPT4;
-		channel = CHANNEL_B;
-		setupStepPin(3, 1);
+		if (!timerClaimed[4]) {
+			timerClaimed[4] = true;
+
+			timer = R_GPT4;
+			channel = CHANNEL_B;
+			setupStepPin(3, 1);
+		}
 		break;
 	case 1:
-		timer = R_GPT4;
-		channel = CHANNEL_A;
-		setupStepPin(3, 2);
+		if (!timerClaimed[4]) {
+			timerClaimed[4] = true;
+			timer = R_GPT4;
+			channel = CHANNEL_A;
+			setupStepPin(3, 2);
+		}
 		break;
 	case 2:
-		timer = R_GPT1;
-		channel = CHANNEL_B;
-		setupStepPin(1, 4);
+		if (!timerClaimed[1]) {
+			timerClaimed[1] = true;
+			timer = R_GPT1;
+			channel = CHANNEL_B;
+			setupStepPin(1, 4);
+		}
 		break;
 	case 3:
-		timer = R_GPT1;
-		channel = CHANNEL_A;
-		setupStepPin(1, 5);
+		if (!timerClaimed[1]) {
+			timerClaimed[1] = true;
+			timer = R_GPT1;
+			channel = CHANNEL_A;
+			setupStepPin(1, 5);
+		}
 		break;
 	case 4:
-		timer = R_GPT0;
-		channel = CHANNEL_B;
-		setupStepPin(1, 6);
+		if (!timerClaimed[0]) {
+			timerClaimed[0] = true;
+			timer = R_GPT0;
+			channel = CHANNEL_B;
+			setupStepPin(1, 6);
+		}
 		break;
 	case 5:
-		timer = R_GPT0;
-		channel = CHANNEL_A;
-		setupStepPin(1, 7);
+		if (!timerClaimed[0]) {
+			timerClaimed[0] = true;
+			timer = R_GPT0;
+			channel = CHANNEL_A;
+			setupStepPin(1, 7);
+		}
 		break;
 	case 6:
-		timer = R_GPT3;
-		channel = CHANNEL_A;
-		setupStepPin(1, 11);
+		if (!timerClaimed[3]) {
+			timerClaimed[3] = true;
+			timer = R_GPT3;
+			channel = CHANNEL_A;
+			setupStepPin(1, 11);
+		}
 		break;
 	case 7:
-		timer = R_GPT3;
-		channel = CHANNEL_B;
-		setupStepPin(1, 12);
+		if (!timerClaimed[3]) {
+			timerClaimed[3] = true;
+			timer = R_GPT3;
+			channel = CHANNEL_B;
+			setupStepPin(1, 12);
+		}
 		break;
 	case 8:
-		timer = R_GPT7;
-		channel = CHANNEL_A;
-		setupStepPin(3, 4);
+		if (!timerClaimed[7]) {
+			timerClaimed[7] = true;
+			timer = R_GPT7;
+			channel = CHANNEL_A;
+			setupStepPin(3, 4);
+		}
 		break;
 	case 9:
-		timer = R_GPT7;
-		channel = CHANNEL_B;
-		setupStepPin(3, 3);
+		if (!timerClaimed[7]) {
+			timerClaimed[7] = true;
+			timer = R_GPT7;
+			channel = CHANNEL_B;
+			setupStepPin(3, 3);
+		}
 		break;
 	case 10:
-		timer = R_GPT2;
-		channel = CHANNEL_A;
-		setupStepPin(1, 3);
+		if (!timerClaimed[2]) {
+			timerClaimed[2] = true;
+			timer = R_GPT2;
+			channel = CHANNEL_A;
+			setupStepPin(1, 3);
+		}
 		break;
 	case 11:
-		timer = R_GPT6;
-		channel = CHANNEL_A;
-		setupStepPin(4, 11);
+		if (!timerClaimed[6]) {
+			timerClaimed[6] = true;
+			timer = R_GPT6;
+			channel = CHANNEL_A;
+			setupStepPin(4, 11);
+		}
 		break;
 	case 12:
-		timer = R_GPT6;
-		channel = CHANNEL_B;
-		setupStepPin(4, 10);
+		if (!timerClaimed[6]) {
+			timerClaimed[6] = true;
+			timer = R_GPT6;
+			channel = CHANNEL_B;
+			setupStepPin(4, 10);
+		}
 		break;
 	case 13:
-		timer = R_GPT2;
-		channel = CHANNEL_B;
-		setupStepPin(1, 2);
+		if (!timerClaimed[2]) {
+			timerClaimed[2] = true;
+			timer = R_GPT2;
+			channel = CHANNEL_B;
+			setupStepPin(1, 2);
+		}
 		break;
 	case A4:
-		timer = R_GPT5;
-		channel = CHANNEL_A;
-		setupStepPin(1, 1);
+		if (!timerClaimed[5]) {
+			timerClaimed[5] = true;
+			timer = R_GPT5;
+			channel = CHANNEL_A;
+			setupStepPin(1, 1);
+		}
 		break;
 	case A5:
-		timer = R_GPT5;
-		channel = CHANNEL_B;
-		setupStepPin(1, 0);
+		if (!timerClaimed[5]) {
+			timerClaimed[5] = true;
+			timer = R_GPT5;
+			channel = CHANNEL_B;
+			setupStepPin(1, 0);
+		}
 		break;
+
 	}
 	if (timer) {
 		setupTimer();
-	} else {
-		return false;
+		rv = true;
 	}
 	pinMode(directionPin, OUTPUT);
 	digitalWrite(directionPin, LOW);
-	return true;
+	return rv;
 }
 
 void GPT_Stepper::setSpeed(float stepsPerSecond) {
+	if (!timer) {
+		return;
+	}
 	if (stepsPerSecond == 0) {
 		stop();
 	} else {
@@ -140,10 +196,13 @@ void GPT_Stepper::setSpeed(float stepsPerSecond) {
 
 void GPT_Stepper::stop() {
 	// stop the timer:
-	timer->GTCR &= ~1;
+	stopTimer();
 }
 
 void GPT_Stepper::setPeriod(uint32_t us) {
+	if (!timer) {
+		return;
+	}
 	// PCLKD is running at full system speed, 48MHz.  That's 48 ticks per microsecond.
 	uint32_t ticks = (clock_uHz * us);
 	uint32_t timerResolution = getTimerResolution(); // We'll need this when we support 32 bit timers
@@ -275,15 +334,20 @@ void GPT_Stepper::setDirection(Direction_t direction) {
 }
 
 void GPT_Stepper::stopTimer() {
-	timer->GTCR &= ~1;
+	if (timer)
+		timer->GTCR &= ~1;
 }
 
 void GPT_Stepper::startTimer() {
-	timer->GTCR |= 1;
+	if (timer)
+		timer->GTCR |= 1;
 }
 
 bool GPT_Stepper::timerRunning() {
-	return (timer->GTCR & 1);
+	if (timer) {
+		return (timer->GTCR & 1);
+	}
+	return false;
 }
 
 uint16_t GPT_Stepper::getDivider() {
