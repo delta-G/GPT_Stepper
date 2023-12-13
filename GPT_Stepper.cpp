@@ -303,12 +303,12 @@ void GPT_Stepper::setupTimer() {
 	timer->GTCNT = 0;
 
 	//set GTIOC pin function GTIOR
-	//0x09 is Initial state = LOW, HIGH at cycle end, LOW at compare match.
+	//0x16 is Initial state = HIGH, LOW at cycle end, HIGH at compare match.
 	if (channel == CHANNEL_A) {
-		timer->GTIOR = 0x00000009UL;
+		timer->GTIOR = 0x00000016UL;
 		timer->GTIOR |= 0x100;  // enable the pin
 	} else if (channel == CHANNEL_B) {
-		timer->GTIOR = 0x00090000UL;
+		timer->GTIOR = 0x00160000UL;
 		timer->GTIOR |= 0x1000000;  // enable the pin
 	}
 
