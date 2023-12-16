@@ -263,6 +263,19 @@ bool GPT_Stepper::init() {
 	return rv;
 }
 
+void GPT_Stepper::setAcceleration(float stepsPerSecondPerSecond){
+	acceleration = stepsPerSecondPerSecond;
+}
+
+/// TODO:  This should check against the 32bit resolution of the timer
+////        and actually set the closest achievable value. 
+void GPT_Stepper::setRequestedSpeed(float stepsPerSecond) {
+	requestedSpeed = stepsPerSecond;
+	if(!timerRunning()){
+		setSpeed(getNewSpeed());
+	}
+}
+
 void GPT_Stepper::setSpeed(float stepsPerSecond) {
 	if (!timer) {
 		return;
@@ -417,7 +430,7 @@ void GPT_Stepper::setupTimer() {
 	// Not applicable to our situation
 
 	//Start count operation GTCR.CST = 1
-	timer->GTCR |= 1;
+//	timer->GTCR |= 1;
 }
 
 void GPT_Stepper::setupInterrupt(uint8_t ch, void (*isr)()) {
@@ -482,5 +495,30 @@ void GPT_Stepper::internalISR() {
 	} else {
 		position += 1;
 	}
+	setSpeed(getNewSpeed());
 }
 
+float GPT_Stepper::getNewSpeed(){
+	float rv = speed;
+	if(speed < requestedSpeed){
+		if(speed == 0){
+			rv = sqrt(2.0 * acceleration);
+		} else {
+			rv = speed + (abs(acceleration/speed));
+		}
+		if(rv > requestedSpeed){
+			rv = requestedSpeed;
+		}
+	}
+	else if (speed > requestedSpeed){
+		if(speed == 0){
+			rv = -(sqrt(2.0 * acceleration));
+		} else {
+			rv = speed - (abs(acceleration/speed));
+		}
+		if (rv < requestedSpeed){
+			rv = requestedSpeed;
+		}
+	}
+	return rv;
+}

@@ -59,12 +59,15 @@ private:
 	uint8_t directionPin;
 	uint8_t stepPin;
 	float speed;
+	float requestedSpeed;
+	float acceleration;
 	volatile long position;
 
 	void setupStepPin(uint8_t port, uint8_t pin);
 	void setupTimer();
 	void setupInterrupt(uint8_t ch, void (*isr)());
 	void setDirection(Direction_t direction);
+	float getNewSpeed();
 
 	bool timerRunning();
 	void startTimer();
@@ -78,6 +81,8 @@ public:
 			directionPin(dpin), stepPin(spin) {
 	}
 	bool init();
+	void setAcceleration(float stepsPerSecondPerSecond);
+	void setRequestedSpeed(float stepsPerSecond);
 	void setSpeed(float stepsPerSecond);
 	void stop();
 	void setPeriod(uint32_t us);
