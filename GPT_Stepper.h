@@ -26,6 +26,7 @@
 #endif
 
 #include "Arduino.h"
+#include "IRQManager.h"
 
 typedef enum {
 	CHANNEL_A, CHANNEL_B
@@ -38,21 +39,29 @@ protected:
 		D_CCW, D_CW
 	};
 	friend void GPT0_ISR();
-	static GPT_Stepper* isrRegistry[8];
+	friend void GPT1_ISR();
+	friend void GPT2_ISR();
+	friend void GPT3_ISR();
+	friend void GPT4_ISR();
+	friend void GPT5_ISR();
+	friend void GPT6_ISR();
+	friend void GPT7_ISR();
+	static GPT_Stepper *isrRegistry[8];
 	void internalISR();
+	uint8_t eventLinkIndex;
 
 private:
 
 	R_GPT0_Type *timer;
 	gpt_channel_t channel;
 	static bool timerClaimed[8];
-	
 
 	uint8_t directionPin;
 	uint8_t stepPin;
 
 	void setupStepPin(uint8_t port, uint8_t pin);
 	void setupTimer();
+	void setupInterrupt(void (*isr)());
 	void setDirection(Direction_t direction);
 
 	bool timerRunning();
@@ -61,7 +70,6 @@ private:
 
 	uint16_t getDivider();
 	uint32_t getTimerResolution();
-		
 
 public:
 	GPT_Stepper(uint8_t spin, uint8_t dpin) :

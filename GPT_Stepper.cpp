@@ -24,7 +24,7 @@
 const uint32_t clock_uHz = (F_CPU / 1000000);
 
 bool GPT_Stepper::timerClaimed[8];
-GPT_Stepper* GPT_Stepper::isrRegistry[8];
+GPT_Stepper *GPT_Stepper::isrRegistry[8];
 
 /**********************************************************************
  * 
@@ -32,39 +32,54 @@ GPT_Stepper* GPT_Stepper::isrRegistry[8];
  * 
  *********************************************************************/
 
-void GPT0_ISR(){
+void GPT0_ISR() {
 	R_GPT0->GTST &= ~(1 << R_GPT0_GTST_TCFPO_Pos);
-	GPT_Stepper::isrRegistry[0]->internalISR();	
+	R_ICU->IELSR[GPT_Stepper::isrRegistry[0]->eventLinkIndex] &=
+			~(R_ICU_IELSR_IR_Msk);
+	GPT_Stepper::isrRegistry[0]->internalISR();
 }
-void GPT1_ISR(){
-	R_GPT1->GTST &= ~(1 << R_GPT1_GTST_TCFPO_Pos);
-	GPT_Stepper::isrRegistry[1]->internalISR();	
+void GPT1_ISR() {
+	R_GPT1->GTST &= ~(1 << R_GPT0_GTST_TCFPO_Pos);
+	R_ICU->IELSR[GPT_Stepper::isrRegistry[1]->eventLinkIndex] &=
+			~(R_ICU_IELSR_IR_Msk);
+	GPT_Stepper::isrRegistry[1]->internalISR();
 }
-void GPT2_ISR(){
-	R_GPT2->GTST &= ~(1 << R_GPT2_GTST_TCFPO_Pos);
-	GPT_Stepper::isrRegistry[2]->internalISR();	
+void GPT2_ISR() {
+	R_GPT2->GTST &= ~(1 << R_GPT0_GTST_TCFPO_Pos);
+	R_ICU->IELSR[GPT_Stepper::isrRegistry[2]->eventLinkIndex] &=
+			~(R_ICU_IELSR_IR_Msk);
+	GPT_Stepper::isrRegistry[2]->internalISR();
 }
-void GPT3_ISR(){
-	R_GPT3->GTST &= ~(1 << R_GPT3_GTST_TCFPO_Pos);
-	GPT_Stepper::isrRegistry[3]->internalISR();	
+void GPT3_ISR() {
+	R_GPT3->GTST &= ~(1 << R_GPT0_GTST_TCFPO_Pos);
+	R_ICU->IELSR[GPT_Stepper::isrRegistry[3]->eventLinkIndex] &=
+			~(R_ICU_IELSR_IR_Msk);
+	GPT_Stepper::isrRegistry[3]->internalISR();
 }
-void GPT4_ISR(){
-	R_GPT4->GTST &= ~(1 << R_GPT4_GTST_TCFPO_Pos);
-	GPT_Stepper::isrRegistry[4]->internalISR();	
+void GPT4_ISR() {
+	R_GPT4->GTST &= ~(1 << R_GPT0_GTST_TCFPO_Pos);
+	R_ICU->IELSR[GPT_Stepper::isrRegistry[4]->eventLinkIndex] &=
+			~(R_ICU_IELSR_IR_Msk);
+	GPT_Stepper::isrRegistry[4]->internalISR();
 }
-void GPT5_ISR(){
-	R_GPT5->GTST &= ~(1 << R_GPT5_GTST_TCFPO_Pos);
-	GPT_Stepper::isrRegistry[5]->internalISR();	
+void GPT5_ISR() {
+	R_GPT5->GTST &= ~(1 << R_GPT0_GTST_TCFPO_Pos);
+	R_ICU->IELSR[GPT_Stepper::isrRegistry[5]->eventLinkIndex] &=
+			~(R_ICU_IELSR_IR_Msk);
+	GPT_Stepper::isrRegistry[5]->internalISR();
 }
-void GPT6_ISR(){
-	R_GPT6->GTST &= ~(1 << R_GPT6_GTST_TCFPO_Pos);
-	GPT_Stepper::isrRegistry[6]->internalISR();	
+void GPT6_ISR() {
+	R_GPT6->GTST &= ~(1 << R_GPT0_GTST_TCFPO_Pos);
+	R_ICU->IELSR[GPT_Stepper::isrRegistry[6]->eventLinkIndex] &=
+			~(R_ICU_IELSR_IR_Msk);
+	GPT_Stepper::isrRegistry[6]->internalISR();
 }
-void GPT7_ISR(){
-	R_GPT7->GTST &= ~(1 << R_GPT7_GTST_TCFPO_Pos);
-	GPT_Stepper::isrRegistry[7]->internalISR();	
+void GPT7_ISR() {
+	R_GPT7->GTST &= ~(1 << R_GPT0_GTST_TCFPO_Pos);
+	R_ICU->IELSR[GPT_Stepper::isrRegistry[7]->eventLinkIndex] &=
+			~(R_ICU_IELSR_IR_Msk);
+	GPT_Stepper::isrRegistry[7]->internalISR();
 }
-
 
 /**********************************************************************
  * 
@@ -80,10 +95,11 @@ bool GPT_Stepper::init() {
 	case 0:
 		if (!timerClaimed[4]) {
 			timerClaimed[4] = true;
-
 			timer = R_GPT4;
 			channel = CHANNEL_B;
 			setupStepPin(3, 1);
+			setupInterrupt (GPT4_ISR);
+			isrRegistry[4] = this;
 		}
 		break;
 	case 1:
@@ -92,6 +108,8 @@ bool GPT_Stepper::init() {
 			timer = R_GPT4;
 			channel = CHANNEL_A;
 			setupStepPin(3, 2);
+			setupInterrupt (GPT4_ISR);
+			isrRegistry[4] = this;
 		}
 		break;
 	case 2:
@@ -100,6 +118,8 @@ bool GPT_Stepper::init() {
 			timer = R_GPT1;
 			channel = CHANNEL_B;
 			setupStepPin(1, 4);
+			setupInterrupt (GPT1_ISR);
+			isrRegistry[1] = this;
 		}
 		break;
 	case 3:
@@ -108,6 +128,8 @@ bool GPT_Stepper::init() {
 			timer = R_GPT1;
 			channel = CHANNEL_A;
 			setupStepPin(1, 5);
+			setupInterrupt (GPT1_ISR);
+			isrRegistry[1] = this;
 		}
 		break;
 	case 4:
@@ -116,6 +138,8 @@ bool GPT_Stepper::init() {
 			timer = R_GPT0;
 			channel = CHANNEL_B;
 			setupStepPin(1, 6);
+			setupInterrupt (GPT0_ISR);
+			isrRegistry[0] = this;
 		}
 		break;
 	case 5:
@@ -124,6 +148,8 @@ bool GPT_Stepper::init() {
 			timer = R_GPT0;
 			channel = CHANNEL_A;
 			setupStepPin(1, 7);
+			setupInterrupt (GPT0_ISR);
+			isrRegistry[0] = this;
 		}
 		break;
 	case 6:
@@ -132,6 +158,8 @@ bool GPT_Stepper::init() {
 			timer = R_GPT3;
 			channel = CHANNEL_A;
 			setupStepPin(1, 11);
+			setupInterrupt (GPT3_ISR);
+			isrRegistry[3] = this;
 		}
 		break;
 	case 7:
@@ -140,6 +168,8 @@ bool GPT_Stepper::init() {
 			timer = R_GPT3;
 			channel = CHANNEL_B;
 			setupStepPin(1, 12);
+			setupInterrupt (GPT3_ISR);
+			isrRegistry[3] = this;
 		}
 		break;
 	case 8:
@@ -148,6 +178,8 @@ bool GPT_Stepper::init() {
 			timer = R_GPT7;
 			channel = CHANNEL_A;
 			setupStepPin(3, 4);
+			setupInterrupt (GPT7_ISR);
+			isrRegistry[7] = this;
 		}
 		break;
 	case 9:
@@ -156,6 +188,8 @@ bool GPT_Stepper::init() {
 			timer = R_GPT7;
 			channel = CHANNEL_B;
 			setupStepPin(3, 3);
+			setupInterrupt (GPT7_ISR);
+			isrRegistry[7] = this;
 		}
 		break;
 	case 10:
@@ -164,6 +198,8 @@ bool GPT_Stepper::init() {
 			timer = R_GPT2;
 			channel = CHANNEL_A;
 			setupStepPin(1, 3);
+			setupInterrupt (GPT2_ISR);
+			isrRegistry[2] = this;
 		}
 		break;
 	case 11:
@@ -172,6 +208,8 @@ bool GPT_Stepper::init() {
 			timer = R_GPT6;
 			channel = CHANNEL_A;
 			setupStepPin(4, 11);
+			setupInterrupt (GPT6_ISR);
+			isrRegistry[6] = this;
 		}
 		break;
 	case 12:
@@ -180,6 +218,8 @@ bool GPT_Stepper::init() {
 			timer = R_GPT6;
 			channel = CHANNEL_B;
 			setupStepPin(4, 10);
+			setupInterrupt (GPT6_ISR);
+			isrRegistry[6] = this;
 		}
 		break;
 	case 13:
@@ -188,6 +228,8 @@ bool GPT_Stepper::init() {
 			timer = R_GPT2;
 			channel = CHANNEL_B;
 			setupStepPin(1, 2);
+			setupInterrupt (GPT2_ISR);
+			isrRegistry[2] = this;
 		}
 		break;
 	case A4:
@@ -196,6 +238,8 @@ bool GPT_Stepper::init() {
 			timer = R_GPT5;
 			channel = CHANNEL_A;
 			setupStepPin(1, 1);
+			setupInterrupt (GPT5_ISR);
+			isrRegistry[5] = this;
 		}
 		break;
 	case A5:
@@ -204,6 +248,8 @@ bool GPT_Stepper::init() {
 			timer = R_GPT5;
 			channel = CHANNEL_B;
 			setupStepPin(1, 0);
+			setupInterrupt (GPT5_ISR);
+			isrRegistry[5] = this;
 		}
 		break;
 
@@ -366,6 +412,28 @@ void GPT_Stepper::setupTimer() {
 	timer->GTCR |= 1;
 }
 
+void GPT_Stepper::setupInterrupt(void (*isr)()) {
+	timer_cfg_t base;
+	base.channel = channel;
+	base.cycle_end_irq = FSP_INVALID_VECTOR;
+	TimerIrqCfg_t iCfg;
+	iCfg.base_cfg = &base;
+	gpt_extended_cfg_t fake;
+	iCfg.gpt_ext_cfg = &fake;
+	iCfg.agt_ext_cfg = nullptr;
+
+	__disable_irq();
+	if (IRQManager::getInstance().addTimerOverflow(iCfg, isr)) {
+		// Serial.println("Attached Interrupt.");
+		eventLinkIndex = iCfg.base_cfg->cycle_end_irq;
+		R_BSP_IrqDisable((IRQn_Type) eventLinkIndex);
+		R_BSP_IrqStatusClear((IRQn_Type) eventLinkIndex);
+		NVIC_SetPriority((IRQn_Type) eventLinkIndex, 14);
+		R_BSP_IrqEnable((IRQn_Type) eventLinkIndex);
+	}
+	__enable_irq();
+}
+
 void GPT_Stepper::setDirection(Direction_t direction) {
 	if (direction == D_CCW) {
 		digitalWrite(directionPin, LOW);
@@ -399,6 +467,6 @@ uint32_t GPT_Stepper::getTimerResolution() {
 	return 0xFFFF;  // Not supporting 32 bit yet
 }
 
-void GPT_Stepper::internalISR(){
+void GPT_Stepper::internalISR() {
 }
 
