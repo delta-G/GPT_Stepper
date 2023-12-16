@@ -98,7 +98,7 @@ bool GPT_Stepper::init() {
 			timer = R_GPT4;
 			channel = CHANNEL_B;
 			setupStepPin(3, 1);
-			setupInterrupt (GPT4_ISR);
+			setupInterrupt (4, GPT4_ISR);
 			isrRegistry[4] = this;
 		}
 		break;
@@ -108,7 +108,7 @@ bool GPT_Stepper::init() {
 			timer = R_GPT4;
 			channel = CHANNEL_A;
 			setupStepPin(3, 2);
-			setupInterrupt (GPT4_ISR);
+			setupInterrupt (4, GPT4_ISR);
 			isrRegistry[4] = this;
 		}
 		break;
@@ -118,7 +118,7 @@ bool GPT_Stepper::init() {
 			timer = R_GPT1;
 			channel = CHANNEL_B;
 			setupStepPin(1, 4);
-			setupInterrupt (GPT1_ISR);
+			setupInterrupt (1, GPT1_ISR);
 			isrRegistry[1] = this;
 		}
 		break;
@@ -128,7 +128,7 @@ bool GPT_Stepper::init() {
 			timer = R_GPT1;
 			channel = CHANNEL_A;
 			setupStepPin(1, 5);
-			setupInterrupt (GPT1_ISR);
+			setupInterrupt (1, GPT1_ISR);
 			isrRegistry[1] = this;
 		}
 		break;
@@ -138,7 +138,7 @@ bool GPT_Stepper::init() {
 			timer = R_GPT0;
 			channel = CHANNEL_B;
 			setupStepPin(1, 6);
-			setupInterrupt (GPT0_ISR);
+			setupInterrupt (0, GPT0_ISR);
 			isrRegistry[0] = this;
 		}
 		break;
@@ -148,7 +148,7 @@ bool GPT_Stepper::init() {
 			timer = R_GPT0;
 			channel = CHANNEL_A;
 			setupStepPin(1, 7);
-			setupInterrupt (GPT0_ISR);
+			setupInterrupt (0, GPT0_ISR);
 			isrRegistry[0] = this;
 		}
 		break;
@@ -158,7 +158,7 @@ bool GPT_Stepper::init() {
 			timer = R_GPT3;
 			channel = CHANNEL_A;
 			setupStepPin(1, 11);
-			setupInterrupt (GPT3_ISR);
+			setupInterrupt (3, GPT3_ISR);
 			isrRegistry[3] = this;
 		}
 		break;
@@ -168,7 +168,7 @@ bool GPT_Stepper::init() {
 			timer = R_GPT3;
 			channel = CHANNEL_B;
 			setupStepPin(1, 12);
-			setupInterrupt (GPT3_ISR);
+			setupInterrupt (3, GPT3_ISR);
 			isrRegistry[3] = this;
 		}
 		break;
@@ -178,7 +178,7 @@ bool GPT_Stepper::init() {
 			timer = R_GPT7;
 			channel = CHANNEL_A;
 			setupStepPin(3, 4);
-			setupInterrupt (GPT7_ISR);
+			setupInterrupt (7, GPT7_ISR);
 			isrRegistry[7] = this;
 		}
 		break;
@@ -188,7 +188,7 @@ bool GPT_Stepper::init() {
 			timer = R_GPT7;
 			channel = CHANNEL_B;
 			setupStepPin(3, 3);
-			setupInterrupt (GPT7_ISR);
+			setupInterrupt (7, GPT7_ISR);
 			isrRegistry[7] = this;
 		}
 		break;
@@ -198,7 +198,7 @@ bool GPT_Stepper::init() {
 			timer = R_GPT2;
 			channel = CHANNEL_A;
 			setupStepPin(1, 3);
-			setupInterrupt (GPT2_ISR);
+			setupInterrupt (2, GPT2_ISR);
 			isrRegistry[2] = this;
 		}
 		break;
@@ -208,7 +208,7 @@ bool GPT_Stepper::init() {
 			timer = R_GPT6;
 			channel = CHANNEL_A;
 			setupStepPin(4, 11);
-			setupInterrupt (GPT6_ISR);
+			setupInterrupt (6, GPT6_ISR);
 			isrRegistry[6] = this;
 		}
 		break;
@@ -218,7 +218,7 @@ bool GPT_Stepper::init() {
 			timer = R_GPT6;
 			channel = CHANNEL_B;
 			setupStepPin(4, 10);
-			setupInterrupt (GPT6_ISR);
+			setupInterrupt (6, GPT6_ISR);
 			isrRegistry[6] = this;
 		}
 		break;
@@ -228,7 +228,7 @@ bool GPT_Stepper::init() {
 			timer = R_GPT2;
 			channel = CHANNEL_B;
 			setupStepPin(1, 2);
-			setupInterrupt (GPT2_ISR);
+			setupInterrupt (2, GPT2_ISR);
 			isrRegistry[2] = this;
 		}
 		break;
@@ -238,7 +238,7 @@ bool GPT_Stepper::init() {
 			timer = R_GPT5;
 			channel = CHANNEL_A;
 			setupStepPin(1, 1);
-			setupInterrupt (GPT5_ISR);
+			setupInterrupt (5, GPT5_ISR);
 			isrRegistry[5] = this;
 		}
 		break;
@@ -248,7 +248,7 @@ bool GPT_Stepper::init() {
 			timer = R_GPT5;
 			channel = CHANNEL_B;
 			setupStepPin(1, 0);
-			setupInterrupt (GPT5_ISR);
+			setupInterrupt (5, GPT5_ISR);
 			isrRegistry[5] = this;
 		}
 		break;
@@ -267,16 +267,17 @@ void GPT_Stepper::setSpeed(float stepsPerSecond) {
 	if (!timer) {
 		return;
 	}
-	if (stepsPerSecond == 0) {
+	speed = stepsPerSecond;
+	if (speed == 0) {
 		stop();
 	} else {
-		if (stepsPerSecond < 0) {
+		if (speed < 0) {
 			setDirection (D_CCW);
 		} else {
 			setDirection (D_CW);
 		}
 		uint32_t us = 1000000UL
-				/ (stepsPerSecond > 0 ? stepsPerSecond : -stepsPerSecond);
+				/ (speed > 0 ? speed : -speed);
 		setPeriod(us);
 	}
 }
@@ -355,6 +356,13 @@ void GPT_Stepper::setPeriod(uint32_t us) {
 	}
 }
 
+long GPT_Stepper::getPosition(){
+	noInterrupts();
+	long rv = position;
+	interrupts();
+	return rv;
+}
+
 /**********************************************************************
  * 
  *   Private Member Functions
@@ -412,9 +420,9 @@ void GPT_Stepper::setupTimer() {
 	timer->GTCR |= 1;
 }
 
-void GPT_Stepper::setupInterrupt(void (*isr)()) {
+void GPT_Stepper::setupInterrupt(uint8_t ch, void (*isr)()) {
 	timer_cfg_t base;
-	base.channel = channel;
+	base.channel = ch;
 	base.cycle_end_irq = FSP_INVALID_VECTOR;
 	TimerIrqCfg_t iCfg;
 	iCfg.base_cfg = &base;
@@ -431,6 +439,7 @@ void GPT_Stepper::setupInterrupt(void (*isr)()) {
 		NVIC_SetPriority((IRQn_Type) eventLinkIndex, 14);
 		R_BSP_IrqEnable((IRQn_Type) eventLinkIndex);
 	}
+	timer->GTST &= ~(1 << R_GPT0_GTST_TCFPO_Pos);
 	__enable_irq();
 }
 
@@ -468,5 +477,10 @@ uint32_t GPT_Stepper::getTimerResolution() {
 }
 
 void GPT_Stepper::internalISR() {
+	if(speed < 0){
+		position -= 1;
+	} else {
+		position += 1;
+	}
 }
 

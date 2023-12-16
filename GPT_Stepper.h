@@ -58,10 +58,12 @@ private:
 
 	uint8_t directionPin;
 	uint8_t stepPin;
+	float speed;
+	volatile long position;
 
 	void setupStepPin(uint8_t port, uint8_t pin);
 	void setupTimer();
-	void setupInterrupt(void (*isr)());
+	void setupInterrupt(uint8_t ch, void (*isr)());
 	void setDirection(Direction_t direction);
 
 	bool timerRunning();
@@ -79,6 +81,8 @@ public:
 	void setSpeed(float stepsPerSecond);
 	void stop();
 	void setPeriod(uint32_t us);
+	
+	long getPosition();
 
 	GPT_Stepper() = delete;
 	GPT_Stepper(const GPT_Stepper&) = delete;

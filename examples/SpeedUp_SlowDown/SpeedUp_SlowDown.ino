@@ -33,6 +33,8 @@ void loop() {
         inc = -inc;
         speed += inc;
       }
+      Serial.print("Current Pos : ");
+      Serial.println(stepper.getPosition());
       stepper.setSpeed(speed);
     }
   }
