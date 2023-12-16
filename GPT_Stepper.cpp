@@ -24,6 +24,47 @@
 const uint32_t clock_uHz = (F_CPU / 1000000);
 
 bool GPT_Stepper::timerClaimed[8];
+GPT_Stepper* GPT_Stepper::isrRegistry[8];
+
+/**********************************************************************
+ * 
+ *   ISR Functions
+ * 
+ *********************************************************************/
+
+void GPT0_ISR(){
+	R_GPT0->GTST &= ~(1 << R_GPT0_GTST_TCFPO_Pos);
+	GPT_Stepper::isrRegistry[0]->internalISR();	
+}
+void GPT1_ISR(){
+	R_GPT1->GTST &= ~(1 << R_GPT1_GTST_TCFPO_Pos);
+	GPT_Stepper::isrRegistry[1]->internalISR();	
+}
+void GPT2_ISR(){
+	R_GPT2->GTST &= ~(1 << R_GPT2_GTST_TCFPO_Pos);
+	GPT_Stepper::isrRegistry[2]->internalISR();	
+}
+void GPT3_ISR(){
+	R_GPT3->GTST &= ~(1 << R_GPT3_GTST_TCFPO_Pos);
+	GPT_Stepper::isrRegistry[3]->internalISR();	
+}
+void GPT4_ISR(){
+	R_GPT4->GTST &= ~(1 << R_GPT4_GTST_TCFPO_Pos);
+	GPT_Stepper::isrRegistry[4]->internalISR();	
+}
+void GPT5_ISR(){
+	R_GPT5->GTST &= ~(1 << R_GPT5_GTST_TCFPO_Pos);
+	GPT_Stepper::isrRegistry[5]->internalISR();	
+}
+void GPT6_ISR(){
+	R_GPT6->GTST &= ~(1 << R_GPT6_GTST_TCFPO_Pos);
+	GPT_Stepper::isrRegistry[6]->internalISR();	
+}
+void GPT7_ISR(){
+	R_GPT7->GTST &= ~(1 << R_GPT7_GTST_TCFPO_Pos);
+	GPT_Stepper::isrRegistry[7]->internalISR();	
+}
+
 
 /**********************************************************************
  * 
@@ -357,3 +398,7 @@ uint16_t GPT_Stepper::getDivider() {
 uint32_t GPT_Stepper::getTimerResolution() {
 	return 0xFFFF;  // Not supporting 32 bit yet
 }
+
+void GPT_Stepper::internalISR(){
+}
+

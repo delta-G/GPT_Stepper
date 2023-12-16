@@ -37,12 +37,16 @@ protected:
 	enum Direction_t {
 		D_CCW, D_CW
 	};
+	friend void GPT0_ISR();
+	static GPT_Stepper* isrRegistry[8];
+	void internalISR();
 
 private:
 
 	R_GPT0_Type *timer;
 	gpt_channel_t channel;
 	static bool timerClaimed[8];
+	
 
 	uint8_t directionPin;
 	uint8_t stepPin;
@@ -57,6 +61,7 @@ private:
 
 	uint16_t getDivider();
 	uint32_t getTimerResolution();
+		
 
 public:
 	GPT_Stepper(uint8_t spin, uint8_t dpin) :
