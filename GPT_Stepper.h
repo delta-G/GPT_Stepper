@@ -28,15 +28,14 @@
 #include "Arduino.h"
 #include "IRQManager.h"
 
-typedef enum {
-	CHANNEL_A, CHANNEL_B
-} gpt_channel_t;
-
 class GPT_Stepper {
 
 protected:
 	enum Direction_t {
 		D_CCW, D_CW
+	};
+	enum gpt_channel_t {
+		CHANNEL_A, CHANNEL_B
 	};
 	friend void GPT0_ISR();
 	friend void GPT1_ISR();
@@ -58,41 +57,53 @@ private:
 
 	uint8_t directionPin;
 	uint8_t stepPin;
-	float speed;
+	volatile long position;
+	volatile float speed;
 	float requestedSpeed;
 	float acceleration;
-	volatile long position;
 
 	void setupStepPin(uint8_t port, uint8_t pin);
 	void setupTimer();
 	void setupInterrupt(uint8_t ch, void (*isr)());
-	void setDirection(Direction_t direction);
+	void setCurrentSpeed(float stepsPerSecond);
+	void setPeriod(uint32_t us);
 	float getNewSpeed();
+	void setDirection(Direction_t direction);
 
-	bool timerRunning();
-	void startTimer();
 	void stopTimer();
+	void startTimer();
+	bool timerRunning();
 
 	uint16_t getDivider();
 	uint32_t getTimerResolution();
 
 public:
 	GPT_Stepper(uint8_t spin, uint8_t dpin) :
-			directionPin(dpin), stepPin(spin) {
+			directionPin(dpin), stepPin(spin), acceleration(100.0) {
+	}
+	GPT_Stepper(uint8_t spin, uint8_t dpin, float acc) :
+			directionPin(dpin), stepPin(spin), acceleration(acc) {
 	}
 	bool init();
 	void setAcceleration(float stepsPerSecondPerSecond);
-	void setRequestedSpeed(float stepsPerSecond);
 	void setSpeed(float stepsPerSecond);
 	void stop();
-	void setPeriod(uint32_t us);
-	
 	long getPosition();
+	float getCurrentSpeed();
 
 	GPT_Stepper() = delete;
 	GPT_Stepper(const GPT_Stepper&) = delete;
 	GPT_Stepper& operator =(const GPT_Stepper&) = delete;
 
 };
+
+void GPT0_ISR();
+void GPT1_ISR();
+void GPT2_ISR();
+void GPT3_ISR();
+void GPT4_ISR();
+void GPT5_ISR();
+void GPT6_ISR();
+void GPT7_ISR();
 
 #endif /* GPT3_STEPPER_H */

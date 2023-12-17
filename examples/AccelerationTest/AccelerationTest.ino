@@ -3,7 +3,7 @@
 const uint8_t buttonPin = 8;
 long speed = 10;
 
-GPT_Stepper stepper(6,7);
+GPT_Stepper stepper(6,7, 100.0);
 
 void setup() {
   pinMode(buttonPin, INPUT_PULLUP);
@@ -13,8 +13,8 @@ void setup() {
   Serial.println("\n\nStarting AccelerationTest.ino\n\n");
 
   stepper.init();
-  stepper.setAcceleration(100);
-  stepper.setRequestedSpeed(speed);
+  // stepper.setAcceleration(100);
+  stepper.setSpeed(speed);
   delay(5000);
   speed = -500;
 }
@@ -28,7 +28,7 @@ void loop() {
     buttonState = digitalRead(buttonPin);
     if(buttonState == LOW){
       speed = -speed;
-      stepper.setRequestedSpeed(speed);
+      stepper.setSpeed(speed);
     }
     lastButtonState = buttonState;
   }  

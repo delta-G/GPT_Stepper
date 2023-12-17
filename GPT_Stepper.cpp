@@ -26,60 +26,7 @@ const uint32_t clock_uHz = (F_CPU / 1000000);
 bool GPT_Stepper::timerClaimed[8];
 GPT_Stepper *GPT_Stepper::isrRegistry[8];
 
-/**********************************************************************
- * 
- *   ISR Functions
- * 
- *********************************************************************/
 
-void GPT0_ISR() {
-	R_GPT0->GTST &= ~(1 << R_GPT0_GTST_TCFPO_Pos);
-	R_ICU->IELSR[GPT_Stepper::isrRegistry[0]->eventLinkIndex] &=
-			~(R_ICU_IELSR_IR_Msk);
-	GPT_Stepper::isrRegistry[0]->internalISR();
-}
-void GPT1_ISR() {
-	R_GPT1->GTST &= ~(1 << R_GPT0_GTST_TCFPO_Pos);
-	R_ICU->IELSR[GPT_Stepper::isrRegistry[1]->eventLinkIndex] &=
-			~(R_ICU_IELSR_IR_Msk);
-	GPT_Stepper::isrRegistry[1]->internalISR();
-}
-void GPT2_ISR() {
-	R_GPT2->GTST &= ~(1 << R_GPT0_GTST_TCFPO_Pos);
-	R_ICU->IELSR[GPT_Stepper::isrRegistry[2]->eventLinkIndex] &=
-			~(R_ICU_IELSR_IR_Msk);
-	GPT_Stepper::isrRegistry[2]->internalISR();
-}
-void GPT3_ISR() {
-	R_GPT3->GTST &= ~(1 << R_GPT0_GTST_TCFPO_Pos);
-	R_ICU->IELSR[GPT_Stepper::isrRegistry[3]->eventLinkIndex] &=
-			~(R_ICU_IELSR_IR_Msk);
-	GPT_Stepper::isrRegistry[3]->internalISR();
-}
-void GPT4_ISR() {
-	R_GPT4->GTST &= ~(1 << R_GPT0_GTST_TCFPO_Pos);
-	R_ICU->IELSR[GPT_Stepper::isrRegistry[4]->eventLinkIndex] &=
-			~(R_ICU_IELSR_IR_Msk);
-	GPT_Stepper::isrRegistry[4]->internalISR();
-}
-void GPT5_ISR() {
-	R_GPT5->GTST &= ~(1 << R_GPT0_GTST_TCFPO_Pos);
-	R_ICU->IELSR[GPT_Stepper::isrRegistry[5]->eventLinkIndex] &=
-			~(R_ICU_IELSR_IR_Msk);
-	GPT_Stepper::isrRegistry[5]->internalISR();
-}
-void GPT6_ISR() {
-	R_GPT6->GTST &= ~(1 << R_GPT0_GTST_TCFPO_Pos);
-	R_ICU->IELSR[GPT_Stepper::isrRegistry[6]->eventLinkIndex] &=
-			~(R_ICU_IELSR_IR_Msk);
-	GPT_Stepper::isrRegistry[6]->internalISR();
-}
-void GPT7_ISR() {
-	R_GPT7->GTST &= ~(1 << R_GPT0_GTST_TCFPO_Pos);
-	R_ICU->IELSR[GPT_Stepper::isrRegistry[7]->eventLinkIndex] &=
-			~(R_ICU_IELSR_IR_Msk);
-	GPT_Stepper::isrRegistry[7]->internalISR();
-}
 
 /**********************************************************************
  * 
@@ -98,7 +45,7 @@ bool GPT_Stepper::init() {
 			timer = R_GPT4;
 			channel = CHANNEL_B;
 			setupStepPin(3, 1);
-			setupInterrupt (4, GPT4_ISR);
+			setupInterrupt(4, GPT4_ISR);
 			isrRegistry[4] = this;
 		}
 		break;
@@ -108,7 +55,7 @@ bool GPT_Stepper::init() {
 			timer = R_GPT4;
 			channel = CHANNEL_A;
 			setupStepPin(3, 2);
-			setupInterrupt (4, GPT4_ISR);
+			setupInterrupt(4, GPT4_ISR);
 			isrRegistry[4] = this;
 		}
 		break;
@@ -118,7 +65,7 @@ bool GPT_Stepper::init() {
 			timer = R_GPT1;
 			channel = CHANNEL_B;
 			setupStepPin(1, 4);
-			setupInterrupt (1, GPT1_ISR);
+			setupInterrupt(1, GPT1_ISR);
 			isrRegistry[1] = this;
 		}
 		break;
@@ -128,7 +75,7 @@ bool GPT_Stepper::init() {
 			timer = R_GPT1;
 			channel = CHANNEL_A;
 			setupStepPin(1, 5);
-			setupInterrupt (1, GPT1_ISR);
+			setupInterrupt(1, GPT1_ISR);
 			isrRegistry[1] = this;
 		}
 		break;
@@ -138,7 +85,7 @@ bool GPT_Stepper::init() {
 			timer = R_GPT0;
 			channel = CHANNEL_B;
 			setupStepPin(1, 6);
-			setupInterrupt (0, GPT0_ISR);
+			setupInterrupt(0, GPT0_ISR);
 			isrRegistry[0] = this;
 		}
 		break;
@@ -148,7 +95,7 @@ bool GPT_Stepper::init() {
 			timer = R_GPT0;
 			channel = CHANNEL_A;
 			setupStepPin(1, 7);
-			setupInterrupt (0, GPT0_ISR);
+			setupInterrupt(0, GPT0_ISR);
 			isrRegistry[0] = this;
 		}
 		break;
@@ -158,7 +105,7 @@ bool GPT_Stepper::init() {
 			timer = R_GPT3;
 			channel = CHANNEL_A;
 			setupStepPin(1, 11);
-			setupInterrupt (3, GPT3_ISR);
+			setupInterrupt(3, GPT3_ISR);
 			isrRegistry[3] = this;
 		}
 		break;
@@ -168,7 +115,7 @@ bool GPT_Stepper::init() {
 			timer = R_GPT3;
 			channel = CHANNEL_B;
 			setupStepPin(1, 12);
-			setupInterrupt (3, GPT3_ISR);
+			setupInterrupt(3, GPT3_ISR);
 			isrRegistry[3] = this;
 		}
 		break;
@@ -178,7 +125,7 @@ bool GPT_Stepper::init() {
 			timer = R_GPT7;
 			channel = CHANNEL_A;
 			setupStepPin(3, 4);
-			setupInterrupt (7, GPT7_ISR);
+			setupInterrupt(7, GPT7_ISR);
 			isrRegistry[7] = this;
 		}
 		break;
@@ -188,7 +135,7 @@ bool GPT_Stepper::init() {
 			timer = R_GPT7;
 			channel = CHANNEL_B;
 			setupStepPin(3, 3);
-			setupInterrupt (7, GPT7_ISR);
+			setupInterrupt(7, GPT7_ISR);
 			isrRegistry[7] = this;
 		}
 		break;
@@ -198,7 +145,7 @@ bool GPT_Stepper::init() {
 			timer = R_GPT2;
 			channel = CHANNEL_A;
 			setupStepPin(1, 3);
-			setupInterrupt (2, GPT2_ISR);
+			setupInterrupt(2, GPT2_ISR);
 			isrRegistry[2] = this;
 		}
 		break;
@@ -208,7 +155,7 @@ bool GPT_Stepper::init() {
 			timer = R_GPT6;
 			channel = CHANNEL_A;
 			setupStepPin(4, 11);
-			setupInterrupt (6, GPT6_ISR);
+			setupInterrupt(6, GPT6_ISR);
 			isrRegistry[6] = this;
 		}
 		break;
@@ -218,7 +165,7 @@ bool GPT_Stepper::init() {
 			timer = R_GPT6;
 			channel = CHANNEL_B;
 			setupStepPin(4, 10);
-			setupInterrupt (6, GPT6_ISR);
+			setupInterrupt(6, GPT6_ISR);
 			isrRegistry[6] = this;
 		}
 		break;
@@ -228,7 +175,7 @@ bool GPT_Stepper::init() {
 			timer = R_GPT2;
 			channel = CHANNEL_B;
 			setupStepPin(1, 2);
-			setupInterrupt (2, GPT2_ISR);
+			setupInterrupt(2, GPT2_ISR);
 			isrRegistry[2] = this;
 		}
 		break;
@@ -238,7 +185,7 @@ bool GPT_Stepper::init() {
 			timer = R_GPT5;
 			channel = CHANNEL_A;
 			setupStepPin(1, 1);
-			setupInterrupt (5, GPT5_ISR);
+			setupInterrupt(5, GPT5_ISR);
 			isrRegistry[5] = this;
 		}
 		break;
@@ -248,7 +195,7 @@ bool GPT_Stepper::init() {
 			timer = R_GPT5;
 			channel = CHANNEL_B;
 			setupStepPin(1, 0);
-			setupInterrupt (5, GPT5_ISR);
+			setupInterrupt(5, GPT5_ISR);
 			isrRegistry[5] = this;
 		}
 		break;
@@ -263,41 +210,140 @@ bool GPT_Stepper::init() {
 	return rv;
 }
 
-void GPT_Stepper::setAcceleration(float stepsPerSecondPerSecond){
-	acceleration = stepsPerSecondPerSecond;
-}
-
-/// TODO:  This should check against the 32bit resolution of the timer
-////        and actually set the closest achievable value. 
-void GPT_Stepper::setRequestedSpeed(float stepsPerSecond) {
-	requestedSpeed = stepsPerSecond;
-	if(!timerRunning()){
-		setSpeed(getNewSpeed());
+void GPT_Stepper::setAcceleration(float stepsPerSecondPerSecond) {
+	if (stepsPerSecondPerSecond > 0) {
+		acceleration = stepsPerSecondPerSecond;
 	}
 }
 
+/// TODO:  This should check against the 32bit resolution of the timer
+////        and actually set the closest achievable value and return it
 void GPT_Stepper::setSpeed(float stepsPerSecond) {
+	requestedSpeed = stepsPerSecond;
+	if (!timerRunning()) {
+		setCurrentSpeed(getNewSpeed());
+	}
+}	
+
+void GPT_Stepper::stop() {
+	// stop the timer:
+	requestedSpeed = 0;
+	setCurrentSpeed(0);
+}
+
+
+
+long GPT_Stepper::getPosition() {
+	noInterrupts();
+	long rv = position;
+	interrupts();
+	return rv;
+}
+
+float GPT_Stepper::getCurrentSpeed() {
+	noInterrupts();
+	float rv = speed;
+	interrupts();
+	return rv;
+}
+
+/**********************************************************************
+ * 
+ *   Private Member Functions
+ * 
+ *********************************************************************/
+
+void GPT_Stepper::setupStepPin(uint8_t port, uint8_t pin) {
+	R_PFS->PORT[port].PIN[pin].PmnPFS = (1 << R_PFS_PORT_PIN_PmnPFS_PDR_Pos)
+			| (1 << R_PFS_PORT_PIN_PmnPFS_PMR_Pos)
+			| (3 << R_PFS_PORT_PIN_PmnPFS_PSEL_Pos);
+}
+
+void GPT_Stepper::setupTimer() {
+
+	// enable in Master stop register in case they're not already
+	R_MSTP->MSTPCRD &= ~(1 << R_MSTP_MSTPCRD_MSTPD6_Pos);  // 16bit GPT
+	R_MSTP->MSTPCRD &= ~(1 << R_MSTP_MSTPCRD_MSTPD5_Pos);  // 32bit GPT
+
+	// enable Write GTWP
+	timer->GTWP = 0xA500;
+
+	// set count direction GTUDDTYC
+	timer->GTUDDTYC = 0x00000001;
+
+	//Select count clock GTCR  1/64 prescaler
+	timer->GTCR = 0x03000000;
+
+	//Set Cycle GTPR
+	timer->GTPR = 0xFFFF;
+	timer->GTPBR = 0x3FFF;
+
+	//Set initial value GTCNT
+	timer->GTCNT = 0;
+
+	//set GTIOC pin function GTIOR
+	//0x16 is Initial state = HIGH, LOW at cycle end, HIGH at compare match.
+	if (channel == CHANNEL_A) {
+		timer->GTIOR = 0x00000016UL;
+		timer->GTIOR |= 0x100;  // enable the pin
+	} else if (channel == CHANNEL_B) {
+		timer->GTIOR = 0x00160000UL;
+		timer->GTIOR |= 0x1000000;  // enable the pin
+	}
+
+	//Set buffer ops GTBER
+	timer->GTBER = 0x100001;
+
+	//Set compare match GTCCRA / GTCCRB
+	timer->GTCCR[channel] = 5;
+
+	//Set Buffer Values GTCCRC / GTCCRE and GTCCRD / GTCCRF
+	// Not applicable to our situation
+
+	//Start count operation GTCR.CST = 1
+	// Handled by setPeriod when the stepper is started
+//	timer->GTCR |= 1;
+}
+
+void GPT_Stepper::setupInterrupt(uint8_t ch, void (*isr)()) {
+	timer_cfg_t base;
+	base.channel = ch;
+	base.cycle_end_irq = FSP_INVALID_VECTOR;
+	TimerIrqCfg_t iCfg;
+	iCfg.base_cfg = &base;
+	gpt_extended_cfg_t fake;
+	iCfg.gpt_ext_cfg = &fake;
+	iCfg.agt_ext_cfg = nullptr;
+
+	__disable_irq();
+	if (IRQManager::getInstance().addTimerOverflow(iCfg, isr)) {
+		// Serial.println("Attached Interrupt.");
+		eventLinkIndex = iCfg.base_cfg->cycle_end_irq;
+		R_BSP_IrqDisable((IRQn_Type) eventLinkIndex);
+		R_BSP_IrqStatusClear((IRQn_Type) eventLinkIndex);
+		NVIC_SetPriority((IRQn_Type) eventLinkIndex, 14);
+		R_BSP_IrqEnable((IRQn_Type) eventLinkIndex);
+	}
+	timer->GTST &= ~(1 << R_GPT0_GTST_TCFPO_Pos);
+	__enable_irq();
+}
+
+void GPT_Stepper::setCurrentSpeed(float stepsPerSecond) {
 	if (!timer) {
 		return;
 	}
 	speed = stepsPerSecond;
 	if (speed == 0) {
-		stop();
+		stopTimer();
 	} else {
 		if (speed < 0) {
 			setDirection (D_CCW);
 		} else {
 			setDirection (D_CW);
 		}
-		uint32_t us = 1000000UL
-				/ (speed > 0 ? speed : -speed);
+		uint32_t us = 1000000UL / (speed > 0 ? speed : -speed);
 		setPeriod(us);
 	}
-}
-
-void GPT_Stepper::stop() {
-	// stop the timer:
-	stopTimer();
 }
 
 void GPT_Stepper::setPeriod(uint32_t us) {
@@ -369,91 +415,28 @@ void GPT_Stepper::setPeriod(uint32_t us) {
 	}
 }
 
-long GPT_Stepper::getPosition(){
-	noInterrupts();
-	long rv = position;
-	interrupts();
+float GPT_Stepper::getNewSpeed() {
+	float rv = speed;
+	if (speed < requestedSpeed) {
+		if (speed == 0) {
+			rv = sqrt(2.0 * acceleration);
+		} else {
+			rv = speed + (abs(acceleration / speed));
+		}
+		if (rv > requestedSpeed) {
+			rv = requestedSpeed;
+		}
+	} else if (speed > requestedSpeed) {
+		if (speed == 0) {
+			rv = -(sqrt(2.0 * acceleration));
+		} else {
+			rv = speed - (abs(acceleration / speed));
+		}
+		if (rv < requestedSpeed) {
+			rv = requestedSpeed;
+		}
+	}
 	return rv;
-}
-
-/**********************************************************************
- * 
- *   Private Member Functions
- * 
- *********************************************************************/
-
-void GPT_Stepper::setupStepPin(uint8_t port, uint8_t pin) {
-	R_PFS->PORT[port].PIN[pin].PmnPFS = (1 << R_PFS_PORT_PIN_PmnPFS_PDR_Pos)
-			| (1 << R_PFS_PORT_PIN_PmnPFS_PMR_Pos)
-			| (3 << R_PFS_PORT_PIN_PmnPFS_PSEL_Pos);
-}
-
-void GPT_Stepper::setupTimer() {
-
-	// enable in Master stop register in case they're not already
-	R_MSTP->MSTPCRD &= ~(1 << R_MSTP_MSTPCRD_MSTPD6_Pos);  // 16bit GPT
-	R_MSTP->MSTPCRD &= ~(1 << R_MSTP_MSTPCRD_MSTPD5_Pos);  // 32bit GPT
-
-	// enable Write GTWP
-	timer->GTWP = 0xA500;
-
-	// set count direction GTUDDTYC
-	timer->GTUDDTYC = 0x00000001;
-
-	//Select count clock GTCR  1/64 prescaler
-	timer->GTCR = 0x03000000;
-
-	//Set Cycle GTPR
-	timer->GTPR = 0xFFFF;
-	timer->GTPBR = 0x3FFF;
-
-	//Set initial value GTCNT
-	timer->GTCNT = 0;
-
-	//set GTIOC pin function GTIOR
-	//0x16 is Initial state = HIGH, LOW at cycle end, HIGH at compare match.
-	if (channel == CHANNEL_A) {
-		timer->GTIOR = 0x00000016UL;
-		timer->GTIOR |= 0x100;  // enable the pin
-	} else if (channel == CHANNEL_B) {
-		timer->GTIOR = 0x00160000UL;
-		timer->GTIOR |= 0x1000000;  // enable the pin
-	}
-
-	//Set buffer ops GTBER
-	timer->GTBER = 0x100001;
-
-	//Set compare match GTCCRA / GTCCRB
-	timer->GTCCR[channel] = 5;
-
-	//Set Buffer Values GTCCRC / GTCCRE and GTCCRD / GTCCRF
-	// Not applicable to our situation
-
-	//Start count operation GTCR.CST = 1
-//	timer->GTCR |= 1;
-}
-
-void GPT_Stepper::setupInterrupt(uint8_t ch, void (*isr)()) {
-	timer_cfg_t base;
-	base.channel = ch;
-	base.cycle_end_irq = FSP_INVALID_VECTOR;
-	TimerIrqCfg_t iCfg;
-	iCfg.base_cfg = &base;
-	gpt_extended_cfg_t fake;
-	iCfg.gpt_ext_cfg = &fake;
-	iCfg.agt_ext_cfg = nullptr;
-
-	__disable_irq();
-	if (IRQManager::getInstance().addTimerOverflow(iCfg, isr)) {
-		// Serial.println("Attached Interrupt.");
-		eventLinkIndex = iCfg.base_cfg->cycle_end_irq;
-		R_BSP_IrqDisable((IRQn_Type) eventLinkIndex);
-		R_BSP_IrqStatusClear((IRQn_Type) eventLinkIndex);
-		NVIC_SetPriority((IRQn_Type) eventLinkIndex, 14);
-		R_BSP_IrqEnable((IRQn_Type) eventLinkIndex);
-	}
-	timer->GTST &= ~(1 << R_GPT0_GTST_TCFPO_Pos);
-	__enable_irq();
 }
 
 void GPT_Stepper::setDirection(Direction_t direction) {
@@ -490,35 +473,65 @@ uint32_t GPT_Stepper::getTimerResolution() {
 }
 
 void GPT_Stepper::internalISR() {
-	if(speed < 0){
+	if (speed < 0) {
 		position -= 1;
 	} else {
 		position += 1;
 	}
-	setSpeed(getNewSpeed());
+	setCurrentSpeed(getNewSpeed());
 }
 
-float GPT_Stepper::getNewSpeed(){
-	float rv = speed;
-	if(speed < requestedSpeed){
-		if(speed == 0){
-			rv = sqrt(2.0 * acceleration);
-		} else {
-			rv = speed + (abs(acceleration/speed));
-		}
-		if(rv > requestedSpeed){
-			rv = requestedSpeed;
-		}
-	}
-	else if (speed > requestedSpeed){
-		if(speed == 0){
-			rv = -(sqrt(2.0 * acceleration));
-		} else {
-			rv = speed - (abs(acceleration/speed));
-		}
-		if (rv < requestedSpeed){
-			rv = requestedSpeed;
-		}
-	}
-	return rv;
+/**********************************************************************
+ * 
+ *   ISR Functions
+ * 
+ *********************************************************************/
+
+void GPT0_ISR() {
+	R_GPT0->GTST &= ~(1 << R_GPT0_GTST_TCFPO_Pos);
+	R_ICU->IELSR[GPT_Stepper::isrRegistry[0]->eventLinkIndex] &=
+			~(R_ICU_IELSR_IR_Msk);
+	GPT_Stepper::isrRegistry[0]->internalISR();
+}
+void GPT1_ISR() {
+	R_GPT1->GTST &= ~(1 << R_GPT0_GTST_TCFPO_Pos);
+	R_ICU->IELSR[GPT_Stepper::isrRegistry[1]->eventLinkIndex] &=
+			~(R_ICU_IELSR_IR_Msk);
+	GPT_Stepper::isrRegistry[1]->internalISR();
+}
+void GPT2_ISR() {
+	R_GPT2->GTST &= ~(1 << R_GPT0_GTST_TCFPO_Pos);
+	R_ICU->IELSR[GPT_Stepper::isrRegistry[2]->eventLinkIndex] &=
+			~(R_ICU_IELSR_IR_Msk);
+	GPT_Stepper::isrRegistry[2]->internalISR();
+}
+void GPT3_ISR() {
+	R_GPT3->GTST &= ~(1 << R_GPT0_GTST_TCFPO_Pos);
+	R_ICU->IELSR[GPT_Stepper::isrRegistry[3]->eventLinkIndex] &=
+			~(R_ICU_IELSR_IR_Msk);
+	GPT_Stepper::isrRegistry[3]->internalISR();
+}
+void GPT4_ISR() {
+	R_GPT4->GTST &= ~(1 << R_GPT0_GTST_TCFPO_Pos);
+	R_ICU->IELSR[GPT_Stepper::isrRegistry[4]->eventLinkIndex] &=
+			~(R_ICU_IELSR_IR_Msk);
+	GPT_Stepper::isrRegistry[4]->internalISR();
+}
+void GPT5_ISR() {
+	R_GPT5->GTST &= ~(1 << R_GPT0_GTST_TCFPO_Pos);
+	R_ICU->IELSR[GPT_Stepper::isrRegistry[5]->eventLinkIndex] &=
+			~(R_ICU_IELSR_IR_Msk);
+	GPT_Stepper::isrRegistry[5]->internalISR();
+}
+void GPT6_ISR() {
+	R_GPT6->GTST &= ~(1 << R_GPT0_GTST_TCFPO_Pos);
+	R_ICU->IELSR[GPT_Stepper::isrRegistry[6]->eventLinkIndex] &=
+			~(R_ICU_IELSR_IR_Msk);
+	GPT_Stepper::isrRegistry[6]->internalISR();
+}
+void GPT7_ISR() {
+	R_GPT7->GTST &= ~(1 << R_GPT0_GTST_TCFPO_Pos);
+	R_ICU->IELSR[GPT_Stepper::isrRegistry[7]->eventLinkIndex] &=
+			~(R_ICU_IELSR_IR_Msk);
+	GPT_Stepper::isrRegistry[7]->internalISR();
 }
