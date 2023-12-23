@@ -247,6 +247,17 @@ float GPT_Stepper::getCurrentSpeed() {
 	return rv;
 }
 
+float GPT_Stepper::getAcceleration() {
+	return acceleration;
+}
+
+bool GPT_Stepper::atSpeed() {
+	noInterrupts();
+	bool rv = (speed == requestedSpeed);
+	interrupts();
+	return rv;
+}
+
 /**********************************************************************
  * 
  *   Private Member Functions

@@ -79,7 +79,7 @@ private:
 
 public:
 	GPT_Stepper(uint8_t spin, uint8_t dpin) :
-			directionPin(dpin), stepPin(spin), acceleration(100.0) {
+			GPT_Stepper(spin, dpin, 100.0) {
 	}
 	GPT_Stepper(uint8_t spin, uint8_t dpin, float acc) :
 			directionPin(dpin), stepPin(spin), acceleration(acc) {
@@ -90,6 +90,8 @@ public:
 	void stop();
 	long getPosition();
 	float getCurrentSpeed();
+	float getAcceleration();
+	bool atSpeed();
 
 	GPT_Stepper() = delete;
 	GPT_Stepper(const GPT_Stepper&) = delete;
