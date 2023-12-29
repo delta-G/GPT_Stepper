@@ -83,7 +83,7 @@ public:
 			GPT_Stepper(spin, dpin, 100.0) {
 	}
 	GPT_Stepper(uint8_t spin, uint8_t dpin, float acc) :
-			GPT_Stepper(spin, dpin, 100.0, false) {
+			GPT_Stepper(spin, dpin, acc, false) {
 	}
 	GPT_Stepper(uint8_t spin, uint8_t dpin, float acc, bool inv) :
 			directionPin(dpin), stepPin(spin), acceleration(acc), invert(inv) {
