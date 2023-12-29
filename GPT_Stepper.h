@@ -57,6 +57,7 @@ private:
 
 	uint8_t directionPin;
 	uint8_t stepPin;
+	bool invert;
 	volatile long position;
 	volatile float speed;
 	float requestedSpeed;
@@ -82,7 +83,10 @@ public:
 			GPT_Stepper(spin, dpin, 100.0) {
 	}
 	GPT_Stepper(uint8_t spin, uint8_t dpin, float acc) :
-			directionPin(dpin), stepPin(spin), acceleration(acc) {
+			GPT_Stepper(spin, dpin, 100.0, false) {
+	}
+	GPT_Stepper(uint8_t spin, uint8_t dpin, float acc, bool inv) :
+			directionPin(dpin), stepPin(spin), acceleration(acc), invert(inv) {
 	}
 	bool init();
 	void setAcceleration(float stepsPerSecondPerSecond);
