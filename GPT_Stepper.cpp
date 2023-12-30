@@ -211,7 +211,7 @@ bool GPT_Stepper::init() {
 }
 
 void GPT_Stepper::setAcceleration(float stepsPerSecondPerSecond) {
-	if (stepsPerSecondPerSecond > 0) {
+	if (stepsPerSecondPerSecond >= 0) {
 		acceleration = stepsPerSecondPerSecond;
 	}
 }
