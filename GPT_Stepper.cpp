@@ -344,6 +344,9 @@ void GPT_Stepper::setCurrentSpeed(float stepsPerSecond) {
 		return;
 	}
 	speed = stepsPerSecond;
+	if(abs(speed) < 1.0){
+		speed = 0;
+	}
 	if (speed == 0) {
 		stopTimer();
 	} else {
@@ -367,7 +370,7 @@ void GPT_Stepper::setPeriod(uint32_t us) {
 	uint32_t resetCount = 0xFFFF;
 	// Find smallest divider that works.  1, 4, 16, 64, 256, 1024
 	uint8_t div = 0;
-	for (div = 0; div < 5; div++) {
+	for (div = 0; div <= 5; div++) {
 		if (ticks < (timerResolution - 2000)) {
 			resetCount = ticks;
 			break;
