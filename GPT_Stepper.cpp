@@ -212,14 +212,18 @@ bool GPT_Stepper::init() {
 
 void GPT_Stepper::setAcceleration(float stepsPerSecondPerSecond) {
 	if (stepsPerSecondPerSecond >= 0) {
+		noInterrupts();
 		acceleration = stepsPerSecondPerSecond;
+		interrupts();
 	}
 }
 
 /// TODO:  This should check against the 32bit resolution of the timer
 ////        and actually set the closest achievable value and return it
 void GPT_Stepper::setSpeed(float stepsPerSecond) {
+	noInterrupts();
 	requestedSpeed = invert? stepsPerSecond : -stepsPerSecond;
+	interrupts();
 	if (!timerRunning()) {
 		setCurrentSpeed(getNewSpeed());
 	}
