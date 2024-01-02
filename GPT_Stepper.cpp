@@ -344,7 +344,7 @@ void GPT_Stepper::setCurrentSpeed(float stepsPerSecond) {
 		return;
 	}
 	speed = stepsPerSecond;
-	if(abs(speed) < 1.0){
+	if(abs(speed) < 0.1){
 		speed = 0;
 	}
 	if (speed == 0) {
