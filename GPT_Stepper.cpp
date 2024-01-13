@@ -223,6 +223,9 @@ void GPT_Stepper::setAcceleration(float stepsPerSecondPerSecond) {
 void GPT_Stepper::setSpeed(float stepsPerSecond) {
 	noInterrupts();
 	requestedSpeed = invert? stepsPerSecond : -stepsPerSecond;
+	if(speed < 50){
+		stopTimer(); // So we don't have to wait forever to update the speed
+	}
 	interrupts();
 	if (!timerRunning()) {
 		setCurrentSpeed(getNewSpeed());
