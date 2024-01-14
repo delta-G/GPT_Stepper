@@ -1,0 +1,32 @@
+#######################################
+# Syntax Coloring Map For GPT_Stepper.h
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+GPT_Stepper	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+init	KEYWORD2
+setAcceleration	KEYWORD2
+setSpeed	KEYWORD2
+stop	KEYWORD2
+getPosition	KEYWORD2
+getCurrentSpeed	KEYWORD2
+getAcceleration	KEYWORD2
+atSpeed	KEYWORD2
+
+#######################################
+# Instances (KEYWORD2)
+#######################################
+
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
