@@ -263,6 +263,12 @@ long GPT_Stepper::getPosition() {
 	return rv;
 }
 
+void GPT_Stepper::setHome() {
+	noInterrupts();
+	position = 0;
+	interrupts();
+}
+
 float GPT_Stepper::getCurrentSpeed() {
 	noInterrupts();
 	float rv = speed;

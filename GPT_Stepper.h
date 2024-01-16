@@ -94,6 +94,7 @@ public:
 	void setSpeed(float stepsPerSecond);
 	void stop();
 	long getPosition();
+	void setHome();
 	float getCurrentSpeed();
 	float getAcceleration();
 	bool atSpeed();
