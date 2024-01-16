@@ -19,6 +19,47 @@ Each stepper consumes a GPT timer.  Since each timer is shared by two pins, this
 
 
 
+# Constructor:
+There are three versions.  The first needs just the step pin and direction pin.  The second adds an acceleration value, and the third also adds a boolean to invert the directional control.  
+```
+    GPT_Stepper(uint8_t spin, uint8_t dpin) :
+			GPT_Stepper(spin, dpin, 100.0) {
+	}
+	GPT_Stepper(uint8_t spin, uint8_t dpin, float acc) :
+			GPT_Stepper(spin, dpin, acc, false) {
+	}
+	GPT_Stepper(uint8_t spin, uint8_t dpin, float acc, bool inv) :
+			directionPin(dpin), stepPin(spin), acceleration(acc), invert(inv) {
+	}
+```
 
+The following functions are also available:
+
+`bool init();`  Call from setup to start the timer and initialize the pin
+
+`void setAcceleration(float stepsPerSecondPerSecond);`  Sets acceleration value
+
+`void setSpeed(float stepsPerSecond);`  Sets the requested speed.  The motor will accelerate to this speed according to the set acceleration value. 
+
+`void stop();`  Immediately stops the pulses to the motor. 
+
+`long getPosition();`  Get current motor position
+
+`void setHome();`  Zeros the current motor position. 
+
+`float getCurrentSpeed();`  Get the current speed of the motor in steps/second
+
+`float getAcceleration();`  Get the current acceleration value in steps/second/second
+
+`bool atSpeed();`  Returns true if the motor is at the requested speed and is no longer accelerating, otherwise returns false. 
+
+
+
+
+
+# Changelog
+
+v0.2.0 - changing speeds at less than 50 steps per second no longer uses acceleration
+v0.3.0 - Informs FspTimer.h that it is claiming the timer so FspTimer doesn't try to reallocate it
 
 
