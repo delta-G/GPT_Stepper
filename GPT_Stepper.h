@@ -27,6 +27,7 @@
 
 #include "Arduino.h"
 #include "IRQManager.h"
+#include "FspTimer.h"
 
 class GPT_Stepper {
 

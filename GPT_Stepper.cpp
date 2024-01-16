@@ -47,6 +47,7 @@ bool GPT_Stepper::init() {
 			setupStepPin(3, 1);
 			setupInterrupt(4, GPT4_ISR);
 			isrRegistry[4] = this;
+			FspTimer::set_timer_is_used(GPT_TIMER, 4);
 		}
 		break;
 	case 1:
@@ -57,6 +58,7 @@ bool GPT_Stepper::init() {
 			setupStepPin(3, 2);
 			setupInterrupt(4, GPT4_ISR);
 			isrRegistry[4] = this;
+			FspTimer::set_timer_is_used(GPT_TIMER, 4);
 		}
 		break;
 	case 2:
@@ -67,6 +69,7 @@ bool GPT_Stepper::init() {
 			setupStepPin(1, 4);
 			setupInterrupt(1, GPT1_ISR);
 			isrRegistry[1] = this;
+			FspTimer::set_timer_is_used(GPT_TIMER, 1);
 		}
 		break;
 	case 3:
@@ -77,6 +80,7 @@ bool GPT_Stepper::init() {
 			setupStepPin(1, 5);
 			setupInterrupt(1, GPT1_ISR);
 			isrRegistry[1] = this;
+			FspTimer::set_timer_is_used(GPT_TIMER, 1);
 		}
 		break;
 	case 4:
@@ -87,6 +91,7 @@ bool GPT_Stepper::init() {
 			setupStepPin(1, 6);
 			setupInterrupt(0, GPT0_ISR);
 			isrRegistry[0] = this;
+			FspTimer::set_timer_is_used(GPT_TIMER, 0);
 		}
 		break;
 	case 5:
@@ -97,6 +102,7 @@ bool GPT_Stepper::init() {
 			setupStepPin(1, 7);
 			setupInterrupt(0, GPT0_ISR);
 			isrRegistry[0] = this;
+			FspTimer::set_timer_is_used(GPT_TIMER, 0);
 		}
 		break;
 	case 6:
@@ -107,6 +113,7 @@ bool GPT_Stepper::init() {
 			setupStepPin(1, 11);
 			setupInterrupt(3, GPT3_ISR);
 			isrRegistry[3] = this;
+			FspTimer::set_timer_is_used(GPT_TIMER, 3);
 		}
 		break;
 	case 7:
@@ -117,6 +124,7 @@ bool GPT_Stepper::init() {
 			setupStepPin(1, 12);
 			setupInterrupt(3, GPT3_ISR);
 			isrRegistry[3] = this;
+			FspTimer::set_timer_is_used(GPT_TIMER, 3);
 		}
 		break;
 	case 8:
@@ -127,6 +135,7 @@ bool GPT_Stepper::init() {
 			setupStepPin(3, 4);
 			setupInterrupt(7, GPT7_ISR);
 			isrRegistry[7] = this;
+			FspTimer::set_timer_is_used(GPT_TIMER, 7);
 		}
 		break;
 	case 9:
@@ -137,6 +146,7 @@ bool GPT_Stepper::init() {
 			setupStepPin(3, 3);
 			setupInterrupt(7, GPT7_ISR);
 			isrRegistry[7] = this;
+			FspTimer::set_timer_is_used(GPT_TIMER, 7);
 		}
 		break;
 	case 10:
@@ -147,6 +157,7 @@ bool GPT_Stepper::init() {
 			setupStepPin(1, 3);
 			setupInterrupt(2, GPT2_ISR);
 			isrRegistry[2] = this;
+			FspTimer::set_timer_is_used(GPT_TIMER, 2);
 		}
 		break;
 	case 11:
@@ -157,6 +168,7 @@ bool GPT_Stepper::init() {
 			setupStepPin(4, 11);
 			setupInterrupt(6, GPT6_ISR);
 			isrRegistry[6] = this;
+			FspTimer::set_timer_is_used(GPT_TIMER, 6);
 		}
 		break;
 	case 12:
@@ -167,6 +179,7 @@ bool GPT_Stepper::init() {
 			setupStepPin(4, 10);
 			setupInterrupt(6, GPT6_ISR);
 			isrRegistry[6] = this;
+			FspTimer::set_timer_is_used(GPT_TIMER, 6);
 		}
 		break;
 	case 13:
@@ -177,6 +190,7 @@ bool GPT_Stepper::init() {
 			setupStepPin(1, 2);
 			setupInterrupt(2, GPT2_ISR);
 			isrRegistry[2] = this;
+			FspTimer::set_timer_is_used(GPT_TIMER, 2);
 		}
 		break;
 	case A4:
@@ -187,6 +201,7 @@ bool GPT_Stepper::init() {
 			setupStepPin(1, 1);
 			setupInterrupt(5, GPT5_ISR);
 			isrRegistry[5] = this;
+			FspTimer::set_timer_is_used(GPT_TIMER, 5);
 		}
 		break;
 	case A5:
@@ -197,6 +212,7 @@ bool GPT_Stepper::init() {
 			setupStepPin(1, 0);
 			setupInterrupt(5, GPT5_ISR);
 			isrRegistry[5] = this;
+			FspTimer::set_timer_is_used(GPT_TIMER, 5);
 		}
 		break;
 
