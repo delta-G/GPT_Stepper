@@ -238,7 +238,7 @@ void GPT_Stepper::setAcceleration(float stepsPerSecondPerSecond) {
 ////        and actually set the closest achievable value and return it
 void GPT_Stepper::setSpeed(float stepsPerSecond) {
 	noInterrupts();
-	requestedSpeed = invert? stepsPerSecond : -stepsPerSecond;
+	requestedSpeed = stepsPerSecond;
 	if(speed < 50){
 		stopTimer(); // So we don't have to wait forever to update the speed
 	}
@@ -384,7 +384,7 @@ void GPT_Stepper::setCurrentSpeed(float stepsPerSecond) {
 		} else {
 			setDirection (D_CW);
 		}
-		uint32_t us = 1000000UL / (speed > 0 ? speed : -speed);
+		uint32_t us = 1000000UL / (speed >= 0 ? speed : -speed);
 		setPeriod(us);
 	}
 }
@@ -484,9 +484,9 @@ float GPT_Stepper::getNewSpeed() {
 
 void GPT_Stepper::setDirection(Direction_t direction) {
 	if (direction == D_CCW) {
-		digitalWrite(directionPin, LOW);
+		digitalWrite(directionPin, invert? HIGH : LOW);
 	} else {
-		digitalWrite(directionPin, HIGH);
+		digitalWrite(directionPin, invert? LOW : HIGH);
 	}
 }
 
