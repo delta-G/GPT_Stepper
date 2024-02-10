@@ -61,5 +61,6 @@ The following functions are also available:
 
 v0.2.0 - changing speeds at less than 50 steps per second no longer uses acceleration
 v0.3.0 - Informs FspTimer.h that it is claiming the timer so FspTimer doesn't try to reallocate it
+v0.4.0 - Fixes Bug Inverted motor reporting inverted speed. 
 
 
